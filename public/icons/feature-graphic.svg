@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs>
+    <linearGradient id="bgGradF" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#f7ece0" />
+      <stop offset="50%" stopColor="#ecdac4" />
+      <stop offset="100%" stopColor="#dfc3a7" />
+    </linearGradient>
+    <linearGradient id="dropGradF" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#64c9ff" />
+      <stop offset="100%" stopColor="#258ae8" />
+    </linearGradient>
+    <filter id="shadowF">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#bgGradF)" />
+
+  <!-- Ambient background curves -->
+  <path d="M -50,420 Q 200,300 450,440 T 1050,380" fill="none" stroke="#7b4b2f" stroke-width="6" opacity="0.12" />
+  <path d="M -50,120 Q 300,240 600,100 T 1100,160" fill="none" stroke="#7b4b2f" stroke-width="6" opacity="0.12" />
+
+  <!-- Left: Mascot Hero Lockup -->
+  <g transform="translate(140, 90) scale(3.2)" filter="url(#shadowF)">
+    <path d="M 50,8 C 50,8 18,52 18,72 A 32,32 0 0,0 82,72 C 82,52 50,8 50,8 Z" fill="url(#dropGradF)" stroke="#135ea5" stroke-width="3" />
+    <path d="M 32,46 C 36,36 46,26 48,22" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+    <circle cx="36" cy="62" r="3.5" fill="#0b3863" />
+    <circle cx="64" cy="62" r="3.5" fill="#0b3863" />
+    <path d="M 44,71 Q 50,77 56,71" fill="none" stroke="#0b3863" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <!-- Right: Title & Feature Tags -->
+  <g transform="translate(480, 160)" fill="#6b4528">
+    <text x="0" y="0" font-family="serif, system-ui" font-size="64" font-weight="900" letter-spacing="1">Arrow Zen</text>
+    <text x="0" y="48" font-family="system-ui, sans-serif" font-size="28" font-weight="600" fill="#c0773a">Mindful Escape Puzzle</text>
+    <text x="0" y="105" font-family="system-ui, sans-serif" font-size="19" opacity="0.8">500 Handcrafted Levels · 20 Beautiful Worlds</text>
+    <text x="0" y="140" font-family="system-ui, sans-serif" font-size="19" opacity="0.8">Calm Ambient Music · 100% Offline Playable</text>
+  </g>
+</svg>

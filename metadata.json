@@ -1,0 +1,6 @@
+{
+  "name": "Arrow Zen: Escape Puzzle",
+  "description": "A mindful slide-and-escape puzzle game. Slide every arrow along its path, plan your moves, and free 500 handcrafted levels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
