@@ -56,27 +56,27 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#f5e7d3] dark:bg-[#1c242d] text-[#6b4528] dark:text-[#9fb0cb] select-none">
+    <div className="w-full h-full flex flex-col bg-transparent text-[var(--theme-text)] select-none">
       {/* Top Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 bg-inherit sticky top-0 z-20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle glass-panel-subtle sticky top-0 z-20">
         <button
           onClick={onBack}
           aria-label="Back"
-          className="w-11 h-11 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-90 transition-transform text-slate-800 dark:text-slate-100 shadow-xs"
+          className="w-11 h-11 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('shop')}</h2>
+        <h2 className="text-lg font-bold text-[var(--theme-text)] tracking-wide">{t('shop')}</h2>
 
-        <div className="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-full text-xs font-bold shadow-xs">
+        <div className="flex items-center gap-1.5 glass-card border-amber-400/40 text-amber-500 dark:text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-xs">
           <CoinIcon size={16} />
           <span>{coins}</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-around border-b border-black/10 dark:border-white/10 px-2 py-2 text-xs font-bold bg-black/5 dark:bg-white/5">
+      <div className="flex items-center justify-around border-b border-white/10 dark:border-white/10 px-2 py-2 text-xs font-bold glass-panel-subtle">
         {(
           [
             { id: 'skins', label: 'skins', icon: Sparkles },
@@ -92,8 +92,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               onClick={() => setActiveTab(tab.id)}
               className={`min-h-[38px] py-1.5 px-3 rounded-xl capitalize transition-all flex items-center gap-1.5 ${
                 activeTab === tab.id
-                  ? 'bg-[#c0773a] text-white shadow-sm'
-                  : 'text-inherit opacity-70 hover:opacity-100'
+                  ? 'bg-linear-to-r from-teal-500 to-cyan-500 text-white shadow-md glass-glow-cyan'
+                  : 'glass-button opacity-75 hover:opacity-100'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
 
       {/* Feedback Toast */}
       {purchaseStatus && (
-        <div className="mx-4 mt-3 p-2 bg-emerald-500 text-white text-xs font-bold text-center rounded-xl shadow-md flex items-center justify-center gap-1.5">
+        <div className="mx-4 mt-3 p-2.5 glass-card border-emerald-400/40 text-emerald-400 text-xs font-bold text-center rounded-xl shadow-lg flex items-center justify-center gap-1.5">
           <Check className="w-4 h-4" />
           <span>{purchaseStatus}</span>
         </div>
@@ -123,15 +123,15 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               return (
                 <div
                   key={s.id}
-                  className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
+                  className={`p-3.5 rounded-2xl flex items-center justify-between gap-3 transition-all ${
                     isActive
-                      ? 'bg-amber-500/10 border-amber-500 ring-2 ring-amber-400'
-                      : 'bg-white/60 dark:bg-black/30 border-black/10 dark:border-white/10'
+                      ? 'glass-card border-teal-400 ring-2 ring-teal-400/50 glass-glow-teal'
+                      : 'glass-card'
                   }`}
                 >
                   <div className="flex items-center gap-3 text-left min-w-0">
                     {/* Stylized vector SVG arrow preview */}
-                    <div className="w-16 h-12 shrink-0 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 overflow-hidden">
+                    <div className="w-16 h-12 shrink-0 flex items-center justify-center glass-panel-subtle rounded-xl border border-white/10 overflow-hidden">
                       <ArrowSkinSvg skin={s.id} size={54} animated={isActive} />
                     </div>
 
@@ -139,7 +139,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       <h4 className="font-bold text-sm sm:text-base flex items-center gap-2 truncate">
                         {s.name}
                         {isActive && (
-                          <span className="text-[10px] bg-amber-500 text-white px-2 py-0.5 rounded-full font-bold">
+                          <span className="text-[10px] bg-teal-500 text-white px-2 py-0.5 rounded-full font-bold">
                             Active
                           </span>
                         )}
@@ -155,8 +155,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                         onClick={() => onSelectSkin(s.id)}
                         className={`min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                           isActive
-                            ? 'bg-black/10 text-inherit opacity-60'
-                            : 'bg-[#c0773a] text-white hover:bg-[#a9652d] active:scale-95'
+                            ? 'glass-button opacity-60 cursor-default'
+                            : 'bg-linear-to-r from-teal-500 to-cyan-500 text-white hover:brightness-110 active:scale-95 shadow-md glass-glow-cyan'
                         }`}
                       >
                         {isActive ? 'Equipped' : 'Equip'}
@@ -167,8 +167,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                         disabled={coins < s.cost}
                         className={`min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                           coins >= s.cost
-                            ? 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95'
-                            : 'bg-black/10 text-inherit opacity-40 cursor-not-allowed'
+                            ? 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95 shadow-md'
+                            : 'glass-button opacity-40 cursor-not-allowed'
                         }`}
                       >
                         <span>{s.cost}</span>
@@ -193,10 +193,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               return (
                 <div
                   key={th.id}
-                  className={`p-3 rounded-2xl border text-left flex flex-col justify-between gap-3 ${
+                  className={`p-3 rounded-2xl border text-left flex flex-col justify-between gap-3 backdrop-blur-md transition-all shadow-md ${
                     isActive
-                      ? 'border-amber-500 ring-2 ring-amber-400'
-                      : 'border-black/10 dark:border-white/10'
+                      ? 'ring-2 ring-teal-400 border-teal-400 glass-glow-teal'
+                      : 'border-white/20'
                   }`}
                   style={{ backgroundColor: th.bg, color: th.line }}
                 >
@@ -214,7 +214,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                       onClick={() => onSelectTheme(th.id)}
                       className="w-full min-h-[40px] py-1.5 rounded-xl text-xs font-bold transition-all"
                       style={{
-                        backgroundColor: isActive ? 'rgba(0,0,0,0.1)' : th.line,
+                        backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : th.line,
                         color: th.bg,
                       }}
                     >
@@ -224,7 +224,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     <button
                       onClick={() => onUnlockTheme(th.id, cost)}
                       disabled={coins < cost}
-                      className="w-full min-h-[40px] py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 active:scale-95 transition-all flex items-center justify-center gap-1"
+                      className="w-full min-h-[40px] py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 active:scale-95 transition-all flex items-center justify-center gap-1 shadow-md"
                     >
                       <span>{cost}</span>
                       <CoinIcon size={12} />
@@ -249,10 +249,10 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               return (
                 <div
                   key={b.type}
-                  className="p-4 rounded-2xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 flex items-center justify-between"
+                  className="p-4 rounded-2xl glass-card flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-xl glass-panel-subtle">
                       <Icon size={24} />
                     </div>
                     <div className="text-left">
@@ -266,8 +266,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     disabled={coins < b.cost}
                     className={`min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                       coins >= b.cost
-                        ? 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95'
-                        : 'bg-black/10 text-inherit opacity-40 cursor-not-allowed'
+                        ? 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95 shadow-md'
+                        : 'glass-button opacity-40 cursor-not-allowed'
                     }`}
                   >
                     <span>{b.cost}</span>
@@ -288,7 +288,7 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
               return (
                 <div
                   key={item.id}
-                  className="p-4 rounded-2xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 flex items-center justify-between"
+                  className="p-4 rounded-2xl glass-card flex items-center justify-between"
                 >
                   <div className="text-left">
                     <h4 className="font-bold text-base flex items-center gap-2">
@@ -303,8 +303,8 @@ export const ShopScreen: React.FC<ShopScreenProps> = ({
                     onClick={() => handleIapPurchase(item.id)}
                     className={`min-h-[44px] px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                       isPurchased
-                        ? 'bg-black/10 text-inherit opacity-50 cursor-not-allowed'
-                        : 'bg-[#c0773a] text-white hover:bg-[#a9652d] active:scale-95 shadow-sm'
+                        ? 'glass-button opacity-50 cursor-not-allowed'
+                        : 'bg-linear-to-r from-teal-500 to-cyan-500 text-white hover:brightness-110 active:scale-95 shadow-md glass-glow-cyan'
                     }`}
                   >
                     {isPurchased ? t('purchased') : item.priceFormatted}

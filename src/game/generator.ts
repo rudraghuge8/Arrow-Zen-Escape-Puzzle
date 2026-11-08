@@ -63,41 +63,55 @@ function generateCandidate(
   const isRelief = level > 10 && level % 7 === 0;
   const isSpecial = level % 25 === 0;
 
-  // Gentle progression for early levels
+  const shapeCount = BOARD_SHAPES.length; // 16 puzzle box shapes
+
+  // Gentle progression for early levels, then monotonic escalation
   let targetCells: number;
   let maxArrowLength: number;
   let shapeIdx: number;
 
-  if (level <= 5) {
-    // Tutorial levels: very small, gentle, obvious paths
-    targetCells = 16 + level * 6; // 22, 28, 34, 40, 46
+  if (level === 1) {
+    targetCells = 16;
     maxArrowLength = 3;
-    shapeIdx = 11; // Square for level 1-2, simple shapes for 3-5
-    if (level === 3) shapeIdx = 0; // Ball
-    if (level === 4) shapeIdx = 5; // Diamond
-    if (level === 5) shapeIdx = 1; // Heart
+    shapeIdx = 11; // Monolith Square
+  } else if (level === 2) {
+    targetCells = 22;
+    maxArrowLength = 3;
+    shapeIdx = 11; // Monolith Square
+  } else if (level === 3) {
+    targetCells = 26;
+    maxArrowLength = 3;
+    shapeIdx = 0; // Zen Circle
+  } else if (level === 4) {
+    targetCells = 32;
+    maxArrowLength = 4;
+    shapeIdx = 5; // Diamond Crest
+  } else if (level === 5) {
+    targetCells = 38;
+    maxArrowLength = 4;
+    shapeIdx = 1; // Sacred Heart
   } else if (isRelief) {
-    // Relief level: fewer cells, shorter chains, satisfying clears
-    targetCells = Math.round(45 + level * 1.5);
-    maxArrowLength = Math.min(18, 5 + Math.floor(level / 25));
-    shapeIdx = ((level - 1) * 5) % 12;
+    // Relief level: fewer cells, satisfying cascading clears
+    targetCells = Math.round(36 + Math.pow(level, 0.82) * 1.35);
+    maxArrowLength = Math.min(18, 5 + Math.floor(Math.pow(level, 0.4)));
+    shapeIdx = ((level - 1) * 7) % shapeCount;
   } else if (isSpecial) {
-    // Special world boss level
-    targetCells = Math.min(850, Math.round(90 + level * 2.8));
-    maxArrowLength = Math.min(35, 12 + Math.floor(level / 12));
-    shapeIdx = (Math.floor(level / 25) * 3) % 12;
+    // Special world climax level
+    targetCells = Math.min(780, Math.round(65 + Math.pow(level, 0.92) * 2.15));
+    maxArrowLength = Math.min(32, 8 + Math.floor(Math.pow(level, 0.5)));
+    shapeIdx = (Math.floor(level / 25) * 5) % shapeCount;
   } else {
-    // Standard progression
-    targetCells = Math.min(750, Math.round(35 + level * 2.2));
-    maxArrowLength = Math.min(30, 6 + Math.floor(level / 15));
-    shapeIdx = ((level - 1) * 5) % 12;
+    // Standard progression: smoothly scales from 40 to 680 cells
+    targetCells = Math.min(680, Math.round(28 + Math.pow(level, 0.88) * 1.78));
+    maxArrowLength = Math.min(28, 4 + Math.floor(Math.pow(level, 0.48)));
+    shapeIdx = ((level - 1) * 7) % shapeCount;
   }
 
   const rng = createRng(level * 7919 + 13 + seedOffset);
   const shape = BOARD_SHAPES[shapeIdx];
 
   // Find minimum grid dimension n that fits targetCells
-  let n = level <= 5 ? 5 + Math.floor(level / 2) : 7;
+  let n = level <= 2 ? 5 : level <= 5 ? 6 : 7;
   let shapeMask: Uint8Array = new Uint8Array(n * n);
   let cellCount = 0;
 
@@ -262,12 +276,38 @@ function generateCandidate(
               }
             }
 
+            // Calculate how many ALREADY placed arrows are blocked by this new arrow path
+            // This actively weaves deep interlocking dependency chains
+            let blockedExistingCount = 0;
+            if (level > 2) {
+              const activeSubPath = candidatePath.slice(0, endIdx);
+              for (const existing of arrows) {
+                const eh = existing.c[existing.c.length - 1];
+                const ed = DIRECTIONS[existing.d];
+                let ex = (eh % n) + ed.dx;
+                let ey = Math.floor(eh / n) + ed.dy;
+                while (ex >= 0 && ey >= 0 && ex < n && ey < n) {
+                  const cellIdx = ey * n + ex;
+                  if (activeSubPath.includes(cellIdx)) {
+                    blockedExistingCount++;
+                    break;
+                  }
+                  if (occupancy[cellIdx] >= 0 && occupancy[cellIdx] !== arrowId) {
+                    break;
+                  }
+                  ex += ed.dx;
+                  ey += ed.dy;
+                }
+              }
+            }
+
             const score =
               ray +
               0.2 * endIdx -
               25 * dirVariety -
-              40 * parallelCollisions -
-              0.04 * dirCounts[straightDir];
+              35 * parallelCollisions -
+              0.04 * dirCounts[straightDir] +
+              (level > 5 ? Math.min(3, blockedExistingCount) * 28 : 0);
 
             if (score > bestScore) {
               bestScore = score;
@@ -302,8 +342,20 @@ function generateCandidate(
           c: bestCandidate.path,
           d: bestCandidate.dir,
         });
+
+        // Tutorial levels: keep arrow counts small and crystal clear
+        if (level === 1 && arrows.length >= 3) break;
+        if (level === 2 && arrows.length >= 4) break;
+        if (level === 3 && arrows.length >= 5) break;
+        if (level === 4 && arrows.length >= 6) break;
+        if (level === 5 && arrows.length >= 8) break;
       }
     }
+    if (level === 1 && arrows.length >= 3) break;
+    if (level === 2 && arrows.length >= 4) break;
+    if (level === 3 && arrows.length >= 5) break;
+    if (level === 4 && arrows.length >= 6) break;
+    if (level === 5 && arrows.length >= 8) break;
   }
 
   return { n, shapeMask, arrows, shapeName: shape.name };
@@ -311,18 +363,31 @@ function generateCandidate(
 
 /**
  * Generates and validates a complete, 100% solvable LevelData.
- * Iterates through seeds to pick the best solvable layout that fits the difficulty curve.
+ * Iterates through seeds to pick the best solvable layout that fits the monotonic difficulty curve.
  */
 export function generateLevel(levelNumber: number): LevelData {
   const world = getWorldForLevel(levelNumber);
   const isRelief = levelNumber > 10 && levelNumber % 7 === 0;
   const isSpecial = levelNumber % 25 === 0;
 
+  // Strictly monotonic target par scaling
+  let targetPar: number;
+  if (levelNumber === 1) targetPar = 2;
+  else if (levelNumber === 2) targetPar = 3;
+  else if (levelNumber <= 5) targetPar = 4;
+  else if (isRelief) {
+    targetPar = Math.max(4, Math.round(3 + Math.pow(levelNumber, 0.48) * 0.95));
+  } else if (isSpecial) {
+    targetPar = Math.min(38, Math.round(5 + Math.pow(levelNumber, 0.54) * 1.35));
+  } else {
+    targetPar = Math.min(34, Math.round(3.8 + Math.pow(levelNumber, 0.52) * 1.2));
+  }
+
   let bestLevel: LevelData | null = null;
   let highestScore = -1e9;
 
-  // Try multiple seed variants to find the optimal solvable candidate
-  const attempts = levelNumber <= 10 ? 6 : 14;
+  // Try multiple seed variants to find the optimal solvable candidate matching targetPar
+  const attempts = levelNumber <= 5 ? 6 : 14;
   for (let attempt = 0; attempt < attempts; attempt++) {
     const candidate = generateCandidate(levelNumber, attempt * 101);
     if (candidate.arrows.length < 2) continue;
@@ -330,15 +395,28 @@ export function generateLevel(levelNumber: number): LevelData {
     const solution = solveLevel(candidate.arrows, candidate.n);
     if (!solution.solvable) continue;
 
-    // For tutorial levels (1-5), enforce high initial free ratio (>= 0.4)
-    if (levelNumber <= 5 && solution.initialFreeCount / solution.totalArrows < 0.4) {
+    // For tutorial levels (1-5), enforce high initial free ratio (>= 0.35)
+    if (levelNumber <= 5 && solution.initialFreeCount / solution.totalArrows < 0.35) {
       continue;
     }
 
+    // For level > 5: true puzzle feels best when only 1 or 2 arrows are initially free!
+    let initialFreeScore = 50;
+    if (levelNumber > 5) {
+      if (solution.initialFreeCount === 1) initialFreeScore = 120;
+      else if (solution.initialFreeCount === 2) initialFreeScore = 90;
+      else if (solution.initialFreeCount === 3) initialFreeScore = 40;
+      else initialFreeScore = Math.max(-50, 20 - solution.initialFreeCount * 15);
+    }
+
+    const parDiff = Math.abs(solution.par - targetPar);
+    const parFitness = Math.max(0, 120 - parDiff * 16);
+
     const candidateScore =
-      solution.par * 12 +
-      (100 - (100 * solution.initialFreeCount) / solution.totalArrows) * 2.5 +
-      solution.avgArrowLength * 2;
+      parFitness * 2.5 +
+      initialFreeScore * 2.0 +
+      solution.difficultyScore * 1.5 +
+      solution.par * 14;
 
     if (candidateScore > highestScore) {
       highestScore = candidateScore;

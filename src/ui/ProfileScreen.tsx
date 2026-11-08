@@ -60,24 +60,24 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#f5e7d3] dark:bg-[#1c242d] text-[#6b4528] dark:text-[#9fb0cb] select-none">
+    <div className="w-full h-full flex flex-col bg-transparent text-[var(--theme-text)] select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 bg-inherit sticky top-0 z-20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle glass-panel-subtle sticky top-0 z-20">
         <button
           onClick={onBack}
           aria-label="Back"
-          className="w-11 h-11 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-90 transition-transform text-slate-800 dark:text-slate-100 shadow-xs"
+          className="w-11 h-11 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('profile')}</h2>
+        <h2 className="text-lg font-bold text-[var(--theme-text)] tracking-wide">{t('profile')}</h2>
         <div className="w-11" />
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-sm mx-auto w-full">
         {/* Avatar Display & Selector */}
         <div className="flex flex-col items-center gap-3">
-          <div className="p-3 bg-black/5 dark:bg-white/5 rounded-3xl shadow-sm">
+          <div className="p-3 glass-card rounded-3xl shadow-lg">
             <CharacterAvatar id={selectedAvatar} size={64} />
           </div>
           <div className="flex gap-2 flex-wrap justify-center">
@@ -87,8 +87,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 onClick={() => setSelectedAvatar(av)}
                 className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
                   selectedAvatar === av
-                    ? 'bg-amber-500/20 ring-2 ring-amber-500 scale-105 shadow-sm'
-                    : 'bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10'
+                    ? 'glass-card border-teal-400 ring-2 ring-teal-400 scale-105 shadow-md glass-glow-teal'
+                    : 'glass-panel-subtle hover:scale-105'
                 }`}
               >
                 <CharacterAvatar id={av} size={32} />
@@ -109,7 +109,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Zen Master"
-              className="w-full px-3 py-2.5 rounded-xl border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 text-inherit font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#c0773a]"
+              className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-white/5 dark:bg-white/5 backdrop-blur-md text-inherit font-medium text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
 
@@ -123,7 +123,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="zen.solver@example.com"
-              className="w-full px-3 py-2.5 rounded-xl border border-black/20 dark:border-white/20 bg-black/5 dark:bg-white/5 text-inherit font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#c0773a]"
+              className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-white/5 dark:bg-white/5 backdrop-blur-md text-inherit font-medium text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
           </div>
         </div>
@@ -132,7 +132,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <div className="space-y-2 pt-1">
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-2.5 px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all text-gray-800 dark:text-gray-100"
+            className="w-full py-2.5 px-4 glass-card rounded-xl text-xs font-bold shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-all text-slate-800 dark:text-slate-100 hover:brightness-110"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -157,7 +157,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           <button
             onClick={handleSave}
-            className="w-full py-3 bg-[#c0773a] hover:bg-[#aa632c] active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-3 bg-linear-to-r from-teal-500 to-cyan-500 hover:brightness-110 active:scale-[0.98] text-white font-bold text-sm rounded-xl shadow-lg glass-glow-cyan transition-all flex items-center justify-center gap-1.5"
           >
             {isSaved ? (
               <>
@@ -171,25 +171,25 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         </div>
 
         {/* Stats Grid */}
-        <div className="pt-3 border-t border-black/10 dark:border-white/10">
+        <div className="pt-3 border-t border-white/10 dark:border-white/10">
           <h3 className="text-xs font-bold uppercase tracking-wider opacity-70 mb-2 text-left">
             {t('stats')}
           </h3>
           <div className="grid grid-cols-2 gap-2 text-left">
-            <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl">
-              <p className="text-xl font-bold tabular-nums">{Math.max(0, unlockedLevel - 1)}</p>
+            <div className="glass-card p-3 rounded-xl">
+              <p className="text-xl font-bold tabular-nums text-teal-400">{Math.max(0, unlockedLevel - 1)}</p>
               <p className="text-[11px] opacity-75">{t('levelsCleared')}</p>
             </div>
-            <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl">
-              <p className="text-xl font-bold tabular-nums">{totalStars}</p>
+            <div className="glass-card p-3 rounded-xl">
+              <p className="text-xl font-bold tabular-nums text-amber-400">{totalStars}</p>
               <p className="text-[11px] opacity-75">{t('totalStars')}</p>
             </div>
-            <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl">
-              <p className="text-xl font-bold tabular-nums">{flawlessWins}</p>
+            <div className="glass-card p-3 rounded-xl">
+              <p className="text-xl font-bold tabular-nums text-cyan-400">{flawlessWins}</p>
               <p className="text-[11px] opacity-75">{t('flawlessWins')}</p>
             </div>
-            <div className="bg-black/5 dark:bg-white/5 p-3 rounded-xl">
-              <p className="text-xl font-bold tabular-nums">{todayLevelsCleared}</p>
+            <div className="glass-card p-3 rounded-xl">
+              <p className="text-xl font-bold tabular-nums text-purple-400">{todayLevelsCleared}</p>
               <p className="text-[11px] opacity-75">{t('todayLevels')}</p>
             </div>
           </div>

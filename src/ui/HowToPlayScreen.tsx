@@ -56,17 +56,17 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
   ];
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#f5e7d3] dark:bg-[#1c242d] text-[#6b4528] dark:text-[#9fb0cb] select-none">
+    <div className="w-full h-full flex flex-col bg-transparent text-[var(--theme-text)] select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 bg-inherit sticky top-0 z-20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle glass-panel-subtle sticky top-0 z-20">
         <button
           onClick={onBack}
           aria-label="Back"
-          className="w-11 h-11 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-90 transition-transform text-slate-800 dark:text-slate-100 shadow-xs"
+          className="w-11 h-11 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('howToPlay')}</h2>
+        <h2 className="text-lg font-bold text-[var(--theme-text)] tracking-wide">{t('howToPlay')}</h2>
         <div className="w-11" />
       </div>
 
@@ -74,13 +74,13 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
         {RULES.map((rule, idx) => (
           <div
             key={idx}
-            className="p-3.5 rounded-2xl bg-white/60 dark:bg-black/30 border border-black/10 dark:border-white/10 flex items-start gap-3.5 text-left"
+            className="p-3.5 rounded-2xl glass-card flex items-start gap-3.5 text-left border border-theme-subtle"
           >
-            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10 shrink-0">
+            <div className="w-10 h-10 flex items-center justify-center rounded-xl glass-panel-subtle shrink-0 border border-theme-subtle">
               {rule.icon}
             </div>
             <div>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{rule.title}</h4>
+              <h4 className="font-bold text-sm text-[var(--theme-text)]">{rule.title}</h4>
               <p className="text-xs opacity-75 mt-0.5 leading-relaxed">{rule.desc}</p>
             </div>
           </div>
@@ -89,7 +89,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
         <div className="pt-2">
           <button
             onClick={onStartPlaying}
-            className="w-full min-h-[48px] py-3.5 bg-[#c0773a] hover:bg-[#aa632c] active:scale-[0.98] text-white font-bold text-base rounded-2xl shadow-md transition-all flex items-center justify-center gap-2"
+            className="w-full min-h-[48px] py-3.5 bg-linear-to-r from-teal-500 to-cyan-500 hover:brightness-110 active:scale-[0.98] text-white font-bold text-base rounded-2xl shadow-lg glass-glow-cyan transition-all flex items-center justify-center gap-2"
           >
             <Play className="w-4 h-4 fill-current" />
             <span>{t('continueGame')}</span>

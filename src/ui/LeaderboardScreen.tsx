@@ -41,28 +41,28 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({
   }, [boardType]);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#f5e7d3] dark:bg-[#1c242d] text-[#6b4528] dark:text-[#9fb0cb] select-none">
+    <div className="w-full h-full flex flex-col bg-transparent text-[var(--theme-text)] select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 bg-inherit sticky top-0 z-20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle glass-panel-subtle sticky top-0 z-20">
         <button
           onClick={onBack}
           aria-label="Back"
-          className="w-11 h-11 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-90 transition-transform text-slate-800 dark:text-slate-100 shadow-xs"
+          className="w-11 h-11 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('leaderboard')}</h2>
+        <h2 className="text-lg font-bold text-[var(--theme-text)] tracking-wide">{t('leaderboard')}</h2>
         <div className="w-11" />
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-center gap-3 p-3 border-b border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
+      <div className="flex items-center justify-center gap-3 p-3 border-b border-theme-subtle glass-panel-subtle">
         <button
           onClick={() => setBoardType('weekly')}
           className={`min-h-[40px] py-1.5 px-4 rounded-xl text-xs font-bold transition-all ${
             boardType === 'weekly'
-              ? 'bg-[#c0773a] text-white shadow-sm'
-              : 'opacity-70 hover:opacity-100'
+              ? 'bg-linear-to-r from-teal-500 to-cyan-500 text-white shadow-md glass-glow-cyan'
+              : 'glass-button opacity-75 hover:opacity-100 text-[var(--theme-text)] border border-theme-subtle'
           }`}
         >
           {t('weeklyBoard')}
@@ -71,8 +71,8 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({
           onClick={() => setBoardType('global')}
           className={`min-h-[40px] py-1.5 px-4 rounded-xl text-xs font-bold transition-all ${
             boardType === 'global'
-              ? 'bg-[#c0773a] text-white shadow-sm'
-              : 'opacity-70 hover:opacity-100'
+              ? 'bg-linear-to-r from-teal-500 to-cyan-500 text-white shadow-md glass-glow-cyan'
+              : 'glass-button opacity-75 hover:opacity-100 text-[var(--theme-text)] border border-theme-subtle'
           }`}
         >
           {t('globalBoard')}
@@ -90,10 +90,10 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({
             return (
               <div
                 key={entry.uid}
-                className={`p-3 rounded-2xl flex items-center justify-between border transition-all ${
+                className={`p-3 rounded-2xl flex items-center justify-between transition-all border border-theme-subtle ${
                   isMe
-                    ? 'bg-amber-500/15 border-amber-500 font-bold ring-2 ring-amber-400'
-                    : 'bg-white/60 dark:bg-black/30 border-black/10 dark:border-white/10'
+                    ? 'glass-card border-teal-400 font-bold ring-2 ring-teal-400/50 glass-glow-teal'
+                    : 'glass-card'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({
                   <CharacterAvatar id={entry.avatar} size={36} />
 
                   <div className="text-left leading-tight">
-                    <p className="text-sm font-bold truncate max-w-[140px] text-slate-900 dark:text-slate-100">
+                    <p className="text-sm font-bold truncate max-w-[140px] text-[var(--theme-text)]">
                       {entry.displayName}
                     </p>
                     <p className="text-[11px] opacity-70 flex items-center gap-1">

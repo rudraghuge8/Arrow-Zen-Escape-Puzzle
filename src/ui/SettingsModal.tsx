@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import {
+  ArrowLeft,
   X,
   Volume2,
   Music,
@@ -110,21 +111,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="settings-heading"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md animate-fade-in"
     >
-      <div className="relative w-full max-w-sm max-h-[85vh] bg-[#fcf6ee] dark:bg-[#252f3b] text-[#6b4528] dark:text-[#e2e8f0] rounded-3xl p-5 shadow-2xl flex flex-col gap-4 border border-black/10 dark:border-white/10 overflow-y-auto">
+      <div className="relative w-full max-w-sm max-h-[85vh] glass-card text-[var(--theme-text)] rounded-3xl p-5 shadow-2xl flex flex-col gap-4 border border-theme-subtle overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-black/10 dark:border-white/10 sticky top-0 bg-inherit z-10">
+        <div className="flex items-center justify-between pb-2 border-b border-theme-subtle sticky top-0 bg-transparent backdrop-blur-md z-10">
+          <button
+            onClick={onClose}
+            aria-label="Back"
+            className="w-9 h-9 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
           <h2 id="settings-heading" className="text-xl font-bold">
             {t('settings')}
           </h2>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-95 transition-transform"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="w-9" />
         </div>
 
         {/* Language Switcher */}

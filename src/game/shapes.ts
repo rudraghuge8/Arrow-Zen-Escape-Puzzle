@@ -76,13 +76,43 @@ export const BOARD_SHAPES: readonly BoardShapeDefinition[] = [
     name: 'Square',
     test: () => true,
   },
+  {
+    name: 'Shield',
+    test: (x, y) =>
+      y <= 0
+        ? Math.abs(x) <= 0.88 && y >= -0.88
+        : Math.abs(x) <= 0.88 * (1 - (y * y) / 1.1) && y <= 0.95,
+  },
+  {
+    name: 'Crescent',
+    test: (x, y) => {
+      const r1 = x * x + y * y <= 0.85;
+      const r2 = (x - 0.45) * (x - 0.45) + (y - 0.1) * (y - 0.1) < 0.65;
+      return r1 && !r2;
+    },
+  },
+  {
+    name: 'Octagon',
+    test: (x, y) =>
+      Math.abs(x) <= 0.9 &&
+      Math.abs(y) <= 0.9 &&
+      Math.abs(x) + Math.abs(y) <= 1.28,
+  },
+  {
+    name: 'Hourglass',
+    test: (x, y) => {
+      const ay = Math.abs(y);
+      return Math.abs(x) <= 0.25 + 0.65 * ay && ay <= 0.9;
+    },
+  },
 ] as const;
 
 /**
  * Builds a binary mask (Uint8Array) for a given board shape at resolution n x n.
  */
 export function createShapeMask(shapeIndex: number, n: number): Uint8Array {
-  const shape = BOARD_SHAPES[((shapeIndex % 12) + 12) % 12];
+  const shapeCount = BOARD_SHAPES.length;
+  const shape = BOARD_SHAPES[((shapeIndex % shapeCount) + shapeCount) % shapeCount];
   const mask = new Uint8Array(n * n);
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {

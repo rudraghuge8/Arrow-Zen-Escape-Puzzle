@@ -8,7 +8,7 @@ import { storage } from './storage/storage';
 import type { StorageDataV2 } from './storage/schema';
 import { generateLevel, getWorldForLevel } from './game/generator';
 import type { LevelData, BoosterType, ArrowSkinId, ThemeId, ArrowData } from './game/types';
-import { getTheme } from './game/themes';
+import { getTheme, isThemeLight } from './game/themes';
 import { calculateStars, calculateCoinReward } from './game/rules';
 import { soundEngine } from './audio/soundEngine';
 import { analytics } from './services/analyticsService';
@@ -31,6 +31,7 @@ import { HowToPlayScreen } from './ui/HowToPlayScreen';
 import { SettingsModal } from './ui/SettingsModal';
 import { ProfileScreen } from './ui/ProfileScreen';
 import { AdRewardModal } from './ui/AdRewardModal';
+import { GlobalTransitionOverlay, type TransitionPhase } from './ui/GlobalTransitionOverlay';
 import type { MascotMood } from './ui/Mascot';
 
 type AppScreen =
@@ -55,6 +56,43 @@ export default function App() {
   const [saveData, setSaveData] = useState<StorageDataV2>(() => storage.getData());
   const [screen, setScreen] = useState<AppScreen>('home');
   const [currentLevelData, setCurrentLevelData] = useState<LevelData | null>(null);
+
+  // Global cross-fade transition state
+  const [transitionPhase, setTransitionPhase] = useState<TransitionPhase>('idle');
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const navigateTo = useCallback(
+    (targetScreen: AppScreen) => {
+      if (targetScreen === screen) return;
+      if (saveData.reduceMotion) {
+        setScreen(targetScreen);
+        return;
+      }
+
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+
+      setTransitionPhase('out');
+      transitionTimeoutRef.current = setTimeout(() => {
+        setScreen(targetScreen);
+        setTransitionPhase('in');
+        transitionTimeoutRef.current = setTimeout(() => {
+          setTransitionPhase('idle');
+        }, 140);
+      }, 120);
+    },
+    [screen, saveData.reduceMotion]
+  );
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Gameplay state
   const [lives, setLives] = useState(3);
@@ -93,16 +131,35 @@ export default function App() {
     soundEngine.setMasterVolume(saveData.masterVolume);
   }, [saveData]);
 
-  // Apply theme colors to CSS variables
+  // Apply theme colors to CSS variables and root classes
   const currentTheme = getTheme(saveData.activeTheme);
+  const isLight = isThemeLight(currentTheme);
+
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--bg', currentTheme.bg);
     root.style.setProperty('--ln', currentTheme.line);
     root.style.setProperty('--dr', currentTheme.drop);
+    root.style.setProperty('--theme-bg', currentTheme.bg);
+    root.style.setProperty('--theme-line', currentTheme.line);
+    root.style.setProperty('--theme-text', currentTheme.line);
+    root.style.setProperty('--theme-drop', currentTheme.drop);
+    root.style.setProperty('--theme-accent', currentTheme.accent);
+    root.style.setProperty('--theme-card-bg', currentTheme.cardBg);
+
     root.style.backgroundColor = currentTheme.bg;
     root.style.color = currentTheme.line;
-  }, [currentTheme]);
+
+    if (isLight) {
+      root.classList.remove('dark');
+      root.classList.add('theme-light');
+      root.classList.remove('theme-dark');
+    } else {
+      root.classList.add('dark');
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-light');
+    }
+  }, [currentTheme, isLight]);
 
   // Register ad service callback
   useEffect(() => {
@@ -174,10 +231,25 @@ export default function App() {
     setMascotMood('zen');
     setBombActive(false);
     setMoveHistory([]);
-    setScreen('play');
 
     soundEngine.setLevelTrack(clampedLevel);
-  }, []);
+
+    if (saveData.reduceMotion) {
+      setScreen('play');
+    } else {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+      setTransitionPhase('out');
+      transitionTimeoutRef.current = setTimeout(() => {
+        setScreen('play');
+        setTransitionPhase('in');
+        transitionTimeoutRef.current = setTimeout(() => {
+          setTransitionPhase('idle');
+        }, 140);
+      }, 120);
+    }
+  }, [saveData.reduceMotion]);
 
   // Gameplay Handlers
   const handleArrowEscaped = (arrowId: number, remainingCount: number, comboCount: number) => {
@@ -358,294 +430,341 @@ export default function App() {
         color: currentTheme.line,
       }}
     >
-      {/* 1. PLAYING SCREEN */}
-      {screen === 'play' && currentLevelData && (
-        <main className="relative flex-1 w-full h-full flex flex-col overflow-hidden">
-          <HUD
-            levelNumber={currentLevelData.levelNumber}
-            worldName={currentLevelData.worldName}
-            lives={lives}
-            maxLives={maxLives}
-            coins={saveData.coins}
-            hintsRemaining={saveData.hintsRemaining}
-            boosters={saveData.boosters}
-            bombActive={bombActive}
-            mascotMood={mascotMood}
-            language={saveData.language}
-            canUndo={moveHistory.length > 0}
-            onBack={() => setScreen('home')}
-            onOpenSettings={() => setScreen('settings')}
-            onOpenThemePicker={() => setScreen('shop')}
-            onUseHint={handleUseHint}
-            onUseUndo={handleUseUndo}
-            onToggleBomb={handleToggleBomb}
-            onUseXray={handleUseXray}
-            onUseExtraDrop={handleUseExtraDrop}
-          />
+      {/* Glassmorphic Ambient Luminous Chromatic Light Orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className={`absolute -top-[12%] -left-[10%] w-[380px] h-[380px] rounded-full blur-[90px] animate-pulse ${
+            isLight ? 'opacity-20' : 'opacity-40'
+          }`}
+          style={{
+            background: 'radial-gradient(circle, #38bdf8 0%, #6366f1 70%, transparent 100%)',
+            animationDuration: '8s',
+          }}
+        />
+        <div
+          className={`absolute top-[35%] -right-[15%] w-[360px] h-[360px] rounded-full blur-[85px] animate-pulse ${
+            isLight ? 'opacity-15' : 'opacity-35'
+          }`}
+          style={{
+            background: 'radial-gradient(circle, #a855f7 0%, #ec4899 70%, transparent 100%)',
+            animationDuration: '11s',
+          }}
+        />
+        <div
+          className={`absolute -bottom-[12%] left-[15%] w-[390px] h-[390px] rounded-full blur-[95px] animate-pulse ${
+            isLight ? 'opacity-15' : 'opacity-30'
+          }`}
+          style={{
+            background: 'radial-gradient(circle, #2dd4bf 0%, #06b6d4 70%, transparent 100%)',
+            animationDuration: '9s',
+          }}
+        />
+      </div>
 
-          <TutorialOverlay
-            levelNumber={currentLevelData.levelNumber}
-            language={saveData.language}
-          />
+      {/* Global Screen Cross-Fade Transition Overlay */}
+      <GlobalTransitionOverlay
+        phase={transitionPhase}
+        theme={currentTheme}
+        reduceMotion={saveData.reduceMotion}
+      />
 
-          <div className="flex-1 w-full h-full flex items-center justify-center p-2">
-            <CanvasBoard
-              levelData={currentLevelData}
-              theme={currentTheme}
-              skin={saveData.activeSkin}
-              lives={lives}
-              isGameOver={isGameOver}
-              isWon={isWon}
-              colorBlindMode={saveData.highContrast}
-              reduceMotion={saveData.reduceMotion}
-              largeTapTargets={saveData.largeTapTargets}
-              idleHelpEnabled={saveData.idleHelpEnabled}
-              showFpsOverlay={showFpsOverlay}
-              bombActive={bombActive}
-              onBombUsed={handleBombUsed}
-              onArrowEscaped={handleArrowEscaped}
-              onArrowBlocked={handleArrowBlocked}
-            />
-          </div>
-
-          {/* Victory Modal */}
-          {isWon && (
-            <VictoryModal
+      {/* Active Screen View with Smooth Compositor Cross-Fade */}
+      <div
+        className={`relative flex-1 w-full h-full flex flex-col overflow-hidden transition-all duration-150 ease-out z-10 ${
+          transitionPhase === 'out'
+            ? 'opacity-70 scale-[0.985] filter blur-[0.5px]'
+            : 'opacity-100 scale-100 filter-none'
+        }`}
+      >
+        {/* 1. PLAYING SCREEN */}
+        {screen === 'play' && currentLevelData && (
+          <main className="relative flex-1 w-full h-full flex flex-col overflow-hidden">
+            <HUD
               levelNumber={currentLevelData.levelNumber}
-              stars={calculateStars(maxLives - lives, movesCount, currentLevelData.par)}
-              coinsEarned={calculateCoinReward(
-                calculateStars(maxLives - lives, movesCount, currentLevelData.par),
-                true,
-                1
-              )}
-              timeElapsedMs={elapsedTime}
-              parWaves={currentLevelData.par}
-              difficultyScore={currentLevelData.difficultyScore}
-              todayLevelsCleared={saveData.todayStats.levelsCleared}
-              language={saveData.language}
-              theme={currentTheme}
-              reduceMotion={saveData.reduceMotion}
-              onNextLevel={() => {
-                if (currentLevelData.levelNumber < 500) {
-                  startLevel(currentLevelData.levelNumber + 1);
-                } else {
-                  setScreen('levels');
-                }
-              }}
-              onGoToLevels={() => setScreen('levels')}
-            />
-          )}
-
-          {/* Game Over Modal */}
-          {isGameOver && (
-            <GameOverModal
+              unlockedLevel={saveData.unlockedLevel}
+              worldName={currentLevelData.worldName}
+              lives={lives}
+              maxLives={maxLives}
               coins={saveData.coins}
+              hintsRemaining={saveData.hintsRemaining}
+              boosters={saveData.boosters}
+              bombActive={bombActive}
+              mascotMood={mascotMood}
               language={saveData.language}
-              onRetry={() => startLevel(currentLevelData.levelNumber)}
-              onContinueWithCoins={handleContinueWithCoins}
-              onWatchAdForDrop={handleWatchAdForDrop}
-              onGoToHome={() => setScreen('home')}
+              canUndo={moveHistory.length > 0}
+              onBack={() => navigateTo('home')}
+              onOpenSettings={() => navigateTo('settings')}
+              onOpenThemePicker={() => navigateTo('shop')}
+              onUseHint={handleUseHint}
+              onUseUndo={handleUseUndo}
+              onToggleBomb={handleToggleBomb}
+              onUseXray={handleUseXray}
+              onUseExtraDrop={handleUseExtraDrop}
             />
-          )}
-        </main>
-      )}
 
-      {/* 2. HOME SCREEN */}
-      {screen === 'home' && (
-        <HomeScreen
-          unlockedLevel={saveData.unlockedLevel}
-          profile={saveData.profile}
-          coins={saveData.coins}
-          streakDays={saveData.dailyChallenge.streak}
-          language={saveData.language}
-          onPlayCurrentLevel={() => startLevel(saveData.unlockedLevel)}
-          onOpenLevels={() => setScreen('levels')}
-          onOpenDaily={() => setScreen('daily')}
-          onOpenCalendar={() => setScreen('calendar')}
-          onOpenShop={() => setScreen('shop')}
-          onOpenLeaderboard={() => setScreen('leaderboard')}
-          onOpenAchievements={() => setScreen('achievements')}
-          onOpenHowToPlay={() => setScreen('how')}
-          onOpenSettings={() => setScreen('settings')}
-          onOpenProfile={() => setScreen('profile')}
-        />
-      )}
+            <TutorialOverlay
+              levelNumber={currentLevelData.levelNumber}
+              language={saveData.language}
+            />
 
-      {/* 3. LEVEL PATH / WORLD MAP SCREEN */}
-      {screen === 'levels' && (
-        <LevelPathScreen
-          unlockedLevel={saveData.unlockedLevel}
-          currentLevel={currentLevelData?.levelNumber || saveData.currentLevel}
-          levelStars={saveData.levelStars}
-          language={saveData.language}
-          onSelectLevel={(lvl) => startLevel(lvl)}
-          onBack={() => setScreen('home')}
-        />
-      )}
+            <div className="flex-1 w-full h-full flex items-center justify-center px-4 pt-1 pb-24 relative z-0">
+              <CanvasBoard
+                levelData={currentLevelData}
+                theme={currentTheme}
+                skin={saveData.activeSkin}
+                lives={lives}
+                isGameOver={isGameOver}
+                isWon={isWon}
+                colorBlindMode={saveData.highContrast}
+                reduceMotion={saveData.reduceMotion}
+                largeTapTargets={saveData.largeTapTargets}
+                idleHelpEnabled={saveData.idleHelpEnabled}
+                showFpsOverlay={showFpsOverlay}
+                bombActive={bombActive}
+                onBombUsed={handleBombUsed}
+                onArrowEscaped={handleArrowEscaped}
+                onArrowBlocked={handleArrowBlocked}
+              />
+            </div>
 
-      {/* 4. DAILY CHALLENGE MODAL */}
-      {screen === 'daily' && (
-        <DailyChallengeModal
-          streakDays={saveData.dailyChallenge.streak}
-          isTodayCompleted={saveData.dailyChallenge.lastDate === new Date().toDateString()}
-          language={saveData.language}
-          onPlayDaily={() => {
-            // Generate seed from current date: YYYYMMDD
-            const d = new Date();
-            const dateNum = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-            const dailyLevelNum = (dateNum % 500) + 1;
-            startLevel(dailyLevelNum);
-          }}
-          onClose={() => setScreen('home')}
-        />
-      )}
+            {/* Victory Modal */}
+            {isWon && (
+              <VictoryModal
+                levelNumber={currentLevelData.levelNumber}
+                stars={calculateStars(maxLives - lives, movesCount, currentLevelData.par)}
+                coinsEarned={calculateCoinReward(
+                  calculateStars(maxLives - lives, movesCount, currentLevelData.par),
+                  true,
+                  1
+                )}
+                timeElapsedMs={elapsedTime}
+                parWaves={currentLevelData.par}
+                difficultyScore={currentLevelData.difficultyScore}
+                todayLevelsCleared={saveData.todayStats.levelsCleared}
+                language={saveData.language}
+                theme={currentTheme}
+                reduceMotion={saveData.reduceMotion}
+                onNextLevel={() => {
+                  if (currentLevelData.levelNumber < 500) {
+                    startLevel(currentLevelData.levelNumber + 1);
+                  } else {
+                    navigateTo('levels');
+                  }
+                }}
+                onGoToLevels={() => navigateTo('levels')}
+              />
+            )}
 
-      {/* 5. 7-DAY REWARD CALENDAR */}
-      {screen === 'calendar' && (
-        <DailyRewardCalendar
-          claimedDayCount={saveData.loginCalendar.claimedDayCount}
-          lastClaimDate={saveData.loginCalendar.lastClaimDate}
-          language={saveData.language}
-          onClaim={handleClaimDailyReward}
-          onClose={() => setScreen('home')}
-        />
-      )}
+            {/* Game Over Modal */}
+            {isGameOver && (
+              <GameOverModal
+                coins={saveData.coins}
+                language={saveData.language}
+                onRetry={() => startLevel(currentLevelData.levelNumber)}
+                onContinueWithCoins={handleContinueWithCoins}
+                onWatchAdForDrop={handleWatchAdForDrop}
+                onGoToHome={() => navigateTo('home')}
+              />
+            )}
+          </main>
+        )}
 
-      {/* 6. SHOP SCREEN */}
-      {screen === 'shop' && (
-        <ShopScreen
-          coins={saveData.coins}
-          unlockedSkins={saveData.unlockedSkins}
-          unlockedThemes={saveData.unlockedThemes}
-          activeSkin={saveData.activeSkin}
-          activeTheme={saveData.activeTheme}
-          language={saveData.language}
-          onSelectSkin={(skin) => storage.update((d) => (d.activeSkin = skin))}
-          onUnlockSkin={(skin, cost) => {
-            if (saveData.coins >= cost) {
-              storage.update((d) => {
-                d.coins -= cost;
-                d.unlockedSkins.push(skin);
-                d.activeSkin = skin;
-              });
-              soundEngine.playSfx('coin');
-            }
-          }}
-          onSelectTheme={(themeId) => storage.update((d) => (d.activeTheme = themeId))}
-          onUnlockTheme={(themeId, cost) => {
-            if (saveData.coins >= cost) {
-              storage.update((d) => {
-                d.coins -= cost;
-                d.unlockedThemes.push(themeId);
-                d.activeTheme = themeId;
-              });
-              soundEngine.playSfx('coin');
-            }
-          }}
-          onBuyBooster={(booster, cost) => {
-            if (saveData.coins >= cost) {
-              storage.update((d) => {
-                d.coins -= cost;
-                d.boosters[booster]++;
-              });
-              soundEngine.playSfx('coin');
-            }
-          }}
-          onBack={() => setScreen('home')}
-        />
-      )}
+        {/* 2. HOME SCREEN */}
+        {screen === 'home' && (
+          <HomeScreen
+            unlockedLevel={saveData.unlockedLevel}
+            profile={saveData.profile}
+            coins={saveData.coins}
+            streakDays={saveData.dailyChallenge.streak}
+            language={saveData.language}
+            onPlayCurrentLevel={() => startLevel(saveData.unlockedLevel)}
+            onOpenLevels={() => navigateTo('levels')}
+            onOpenDaily={() => navigateTo('daily')}
+            onOpenCalendar={() => navigateTo('calendar')}
+            onOpenShop={() => navigateTo('shop')}
+            onOpenLeaderboard={() => navigateTo('leaderboard')}
+            onOpenAchievements={() => navigateTo('achievements')}
+            onOpenHowToPlay={() => navigateTo('how')}
+            onOpenSettings={() => navigateTo('settings')}
+            onOpenProfile={() => navigateTo('profile')}
+          />
+        )}
 
-      {/* 7. LEADERBOARD SCREEN */}
-      {screen === 'leaderboard' && (
-        <LeaderboardScreen
-          language={saveData.language}
-          onBack={() => setScreen('home')}
-        />
-      )}
+        {/* 3. LEVEL PATH / WORLD MAP SCREEN */}
+        {screen === 'levels' && (
+          <LevelPathScreen
+            unlockedLevel={saveData.unlockedLevel}
+            currentLevel={currentLevelData?.levelNumber || saveData.currentLevel}
+            levelStars={saveData.levelStars}
+            language={saveData.language}
+            onSelectLevel={(lvl) => startLevel(lvl)}
+            onBack={() => navigateTo('home')}
+          />
+        )}
 
-      {/* 8. ACHIEVEMENTS SCREEN */}
-      {screen === 'achievements' && (
-        <AchievementsScreen
-          unlockedLevel={saveData.unlockedLevel}
-          totalStars={saveData.totalStars}
-          flawlessWins={saveData.flawlessWins}
-          streakDays={saveData.dailyChallenge.streak}
-          achievements={saveData.achievements}
-          language={saveData.language}
-          onClaimReward={handleClaimAchievement}
-          onBack={() => setScreen('home')}
-        />
-      )}
+        {/* 4. DAILY CHALLENGE MODAL */}
+        {screen === 'daily' && (
+          <DailyChallengeModal
+            streakDays={saveData.dailyChallenge.streak}
+            isTodayCompleted={saveData.dailyChallenge.lastDate === new Date().toDateString()}
+            language={saveData.language}
+            onPlayDaily={() => {
+              const d = new Date();
+              const dateNum = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+              const dailyLevelNum = (dateNum % 500) + 1;
+              startLevel(dailyLevelNum);
+            }}
+            onClose={() => navigateTo('home')}
+          />
+        )}
 
-      {/* 9. HOW TO PLAY SCREEN */}
-      {screen === 'how' && (
-        <HowToPlayScreen
-          language={saveData.language}
-          onBack={() => setScreen('home')}
-          onStartPlaying={() => startLevel(saveData.unlockedLevel)}
-        />
-      )}
+        {/* 5. 7-DAY REWARD CALENDAR */}
+        {screen === 'calendar' && (
+          <DailyRewardCalendar
+            claimedDayCount={saveData.loginCalendar.claimedDayCount}
+            lastClaimDate={saveData.loginCalendar.lastClaimDate}
+            language={saveData.language}
+            onClaim={handleClaimDailyReward}
+            onClose={() => navigateTo('home')}
+          />
+        )}
 
-      {/* 10. PROFILE SCREEN */}
-      {screen === 'profile' && (
-        <ProfileScreen
-          profile={saveData.profile}
-          unlockedLevel={saveData.unlockedLevel}
-          totalStars={saveData.totalStars}
-          flawlessWins={saveData.flawlessWins}
-          todayLevelsCleared={saveData.todayStats.levelsCleared}
-          language={saveData.language}
-          onSaveProfile={(prof) => storage.update((d) => (d.profile = prof))}
-          onBack={() => setScreen('home')}
-        />
-      )}
+        {/* 6. SHOP SCREEN */}
+        {screen === 'shop' && (
+          <ShopScreen
+            coins={saveData.coins}
+            unlockedSkins={saveData.unlockedSkins}
+            unlockedThemes={saveData.unlockedThemes}
+            activeSkin={saveData.activeSkin}
+            activeTheme={saveData.activeTheme}
+            language={saveData.language}
+            onSelectSkin={(skin) => storage.update((d) => (d.activeSkin = skin))}
+            onUnlockSkin={(skin, cost) => {
+              if (saveData.coins >= cost) {
+                storage.update((d) => {
+                  d.coins -= cost;
+                  d.unlockedSkins.push(skin);
+                  d.activeSkin = skin;
+                });
+                soundEngine.playSfx('coin');
+              }
+            }}
+            onSelectTheme={(themeId) => storage.update((d) => (d.activeTheme = themeId))}
+            onUnlockTheme={(themeId, cost) => {
+              if (saveData.coins >= cost) {
+                storage.update((d) => {
+                  d.coins -= cost;
+                  d.unlockedThemes.push(themeId);
+                  d.activeTheme = themeId;
+                });
+                soundEngine.playSfx('coin');
+              }
+            }}
+            onBuyBooster={(booster, cost) => {
+              if (saveData.coins >= cost) {
+                storage.update((d) => {
+                  d.coins -= cost;
+                  d.boosters[booster]++;
+                });
+                soundEngine.playSfx('coin');
+              }
+            }}
+            onBack={() => navigateTo('home')}
+          />
+        )}
 
-      {/* 11. SETTINGS MODAL */}
-      {screen === 'settings' && (
-        <SettingsModal
-          soundEnabled={saveData.soundEnabled}
-          musicEnabled={saveData.musicEnabled}
-          vibrationEnabled={saveData.vibrationEnabled}
-          voiceEnabled={saveData.voiceEnabled}
-          masterVolume={saveData.masterVolume}
-          idleHelpEnabled={saveData.idleHelpEnabled}
-          reduceMotion={saveData.reduceMotion}
-          highContrast={saveData.highContrast}
-          largeTapTargets={saveData.largeTapTargets}
-          activeTheme={saveData.activeTheme}
-          language={saveData.language}
-          showFpsOverlay={showFpsOverlay}
-          onToggleSound={() => storage.update((d) => (d.soundEnabled = !d.soundEnabled))}
-          onToggleMusic={() => storage.update((d) => (d.musicEnabled = !d.musicEnabled))}
-          onToggleVibration={() => storage.update((d) => (d.vibrationEnabled = !d.vibrationEnabled))}
-          onToggleVoice={() => storage.update((d) => (d.voiceEnabled = !d.voiceEnabled))}
-          onChangeVolume={(vol) => storage.update((d) => (d.masterVolume = vol))}
-          onToggleIdleHelp={() => storage.update((d) => (d.idleHelpEnabled = !d.idleHelpEnabled))}
-          onToggleReduceMotion={() => storage.update((d) => (d.reduceMotion = !d.reduceMotion))}
-          onToggleHighContrast={() => storage.update((d) => (d.highContrast = !d.highContrast))}
-          onToggleLargeTapTargets={() => storage.update((d) => (d.largeTapTargets = !d.largeTapTargets))}
-          onSelectTheme={(id) => storage.update((d) => (d.activeTheme = id))}
-          onChangeLanguage={(lang) => storage.update((d) => (d.language = lang))}
-          onToggleFpsOverlay={() => setShowFpsOverlay((prev) => !prev)}
-          onResetProgress={() => storage.resetAllProgress()}
-          onClose={() => setScreen('home')}
-        />
-      )}
+        {/* 7. LEADERBOARD SCREEN */}
+        {screen === 'leaderboard' && (
+          <LeaderboardScreen
+            language={saveData.language}
+            onBack={() => navigateTo('home')}
+          />
+        )}
 
-      {/* REWARDED AD MODAL (Simulated) */}
-      {rewardAdRequest && (
-        <AdRewardModal
-          rewardType={rewardAdRequest.type}
-          onRewardClaimed={(granted) => {
-            rewardAdRequest.onComplete(granted);
-            setRewardAdRequest(null);
-          }}
-          onClose={() => {
-            rewardAdRequest.onComplete(false);
-            setRewardAdRequest(null);
-          }}
-        />
-      )}
+        {/* 8. ACHIEVEMENTS SCREEN */}
+        {screen === 'achievements' && (
+          <AchievementsScreen
+            unlockedLevel={saveData.unlockedLevel}
+            totalStars={saveData.totalStars}
+            flawlessWins={saveData.flawlessWins}
+            streakDays={saveData.dailyChallenge.streak}
+            achievements={saveData.achievements}
+            language={saveData.language}
+            onClaimReward={handleClaimAchievement}
+            onBack={() => navigateTo('home')}
+          />
+        )}
+
+        {/* 9. HOW TO PLAY SCREEN */}
+        {screen === 'how' && (
+          <HowToPlayScreen
+            language={saveData.language}
+            onBack={() => navigateTo('home')}
+            onStartPlaying={() => startLevel(saveData.unlockedLevel)}
+          />
+        )}
+
+        {/* 10. PROFILE SCREEN */}
+        {screen === 'profile' && (
+          <ProfileScreen
+            profile={saveData.profile}
+            unlockedLevel={saveData.unlockedLevel}
+            totalStars={saveData.totalStars}
+            flawlessWins={saveData.flawlessWins}
+            todayLevelsCleared={saveData.todayStats.levelsCleared}
+            language={saveData.language}
+            onSaveProfile={(prof) => storage.update((d) => (d.profile = prof))}
+            onBack={() => navigateTo('home')}
+          />
+        )}
+
+        {/* 11. SETTINGS MODAL */}
+        {screen === 'settings' && (
+          <SettingsModal
+            soundEnabled={saveData.soundEnabled}
+            musicEnabled={saveData.musicEnabled}
+            vibrationEnabled={saveData.vibrationEnabled}
+            voiceEnabled={saveData.voiceEnabled}
+            masterVolume={saveData.masterVolume}
+            idleHelpEnabled={saveData.idleHelpEnabled}
+            reduceMotion={saveData.reduceMotion}
+            highContrast={saveData.highContrast}
+            largeTapTargets={saveData.largeTapTargets}
+            activeTheme={saveData.activeTheme}
+            language={saveData.language}
+            showFpsOverlay={showFpsOverlay}
+            onToggleSound={() => storage.update((d) => (d.soundEnabled = !d.soundEnabled))}
+            onToggleMusic={() => storage.update((d) => (d.musicEnabled = !d.musicEnabled))}
+            onToggleVibration={() => storage.update((d) => (d.vibrationEnabled = !d.vibrationEnabled))}
+            onToggleVoice={() => storage.update((d) => (d.voiceEnabled = !d.voiceEnabled))}
+            onChangeVolume={(vol) => storage.update((d) => (d.masterVolume = vol))}
+            onToggleIdleHelp={() => storage.update((d) => (d.idleHelpEnabled = !d.idleHelpEnabled))}
+            onToggleReduceMotion={() => storage.update((d) => (d.reduceMotion = !d.reduceMotion))}
+            onToggleHighContrast={() => storage.update((d) => (d.highContrast = !d.highContrast))}
+            onToggleLargeTapTargets={() => storage.update((d) => (d.largeTapTargets = !d.largeTapTargets))}
+            onSelectTheme={(id) => storage.update((d) => (d.activeTheme = id))}
+            onChangeLanguage={(lang) => storage.update((d) => (d.language = lang))}
+            onToggleFpsOverlay={() => setShowFpsOverlay((prev) => !prev)}
+            onResetProgress={() => storage.resetAllProgress()}
+            onClose={() => navigateTo('home')}
+          />
+        )}
+
+        {/* REWARDED AD MODAL (Simulated) */}
+        {rewardAdRequest && (
+          <AdRewardModal
+            rewardType={rewardAdRequest.type}
+            onRewardClaimed={(granted) => {
+              rewardAdRequest.onComplete(granted);
+              setRewardAdRequest(null);
+            }}
+            onClose={() => {
+              rewardAdRequest.onComplete(false);
+              setRewardAdRequest(null);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

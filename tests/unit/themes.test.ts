@@ -5,10 +5,10 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { THEMES, validateAllThemeContrasts, getContrastRatio } from '../../src/game/themes';
+import { THEMES, validateAllThemeContrasts, getContrastRatio, isThemeLight } from '../../src/game/themes';
 
-test('themes: all 8 themes meet WCAG AA contrast ratio (>= 4.5:1) for readability', () => {
-  assert.equal(THEMES.length, 8, 'Must have at least 8 themes');
+test('themes: all 9 themes meet WCAG AA contrast ratio (>= 4.5:1) for readability', () => {
+  assert.equal(THEMES.length, 9, 'Must have 9 themes including Glassmorphism');
   for (const theme of THEMES) {
     const ratio = getContrastRatio(theme.bg, theme.line);
     assert.ok(
@@ -17,4 +17,16 @@ test('themes: all 8 themes meet WCAG AA contrast ratio (>= 4.5:1) for readabilit
     );
   }
   assert.equal(validateAllThemeContrasts(), true);
+});
+
+test('themes: isThemeLight correctly classifies light vs dark themes', () => {
+  const paper = THEMES.find((t) => t.id === 0)!;
+  const mint = THEMES.find((t) => t.id === 1)!;
+  const slate = THEMES.find((t) => t.id === 2)!;
+  const glass = THEMES.find((t) => t.id === 8)!;
+
+  assert.equal(isThemeLight(paper), true, 'Paper Zen is a light theme');
+  assert.equal(isThemeLight(mint), true, 'Mint Oasis is a light theme');
+  assert.equal(isThemeLight(slate), false, 'Midnight Slate is a dark theme');
+  assert.equal(isThemeLight(glass), false, 'Glassmorphism is a dark theme');
 });

@@ -1,6 +1,6 @@
 # Arrow Zen: Escape Puzzle - 500 Level Difficulty Curve Analysis
 
-Generated on: 2026-11-07T17:28:38.068Z
+Generated on: 2026-11-08T15:31:59.245Z
 Total Levels Verified Solvable: 500 / 500 (100% Solvability Gate Passed)
 
 ## Curve Summary
@@ -20,43 +20,43 @@ Total Levels Verified Solvable: 500 / 500 (100% Solvability Gate Passed)
 ## Detailed Sample Inspection (Every 25th Level)
 | Level | Shape | Grid (N) | Arrows | Par | Difficulty | Type |
 |-------|-------|----------|--------|-----|------------|------|
-| 1 | Square | 5x5 | 10 | 3 | 93 | Tutorial |
-| 2 | Square | 6x6 | 14 | 4 | 107 | Tutorial |
-| 3 | Ball | 7x7 | 14 | 3 | 94 | Tutorial |
-| 4 | Diamond | 8x8 | 16 | 6 | 129 | Tutorial |
-| 5 | Heart | 9x9 | 19 | 4 | 109 | Tutorial |
-| 6 | Heart | 9x9 | 15 | 4 | 104 | Standard |
-| 7 | Trophy | 10x10 | 14 | 4 | 114 | Standard |
-| 8 | Square | 8x8 | 18 | 6 | 144 | Standard |
-| 9 | Butterfly | 9x9 | 21 | 6 | 142 | Standard |
-| 10 | Cross | 10x10 | 20 | 4 | 117 | Standard |
-| 14 | Diamond | 12x12 | 31 | 6 | 150 | Relief |
-| 21 | Butterfly | 11x11 | 29 | 6 | 154 | Relief |
-| 25 | Star | 19x19 | 33 | 7 | 172 | World Boss |
-| 28 | Star | 14x14 | 29 | 7 | 160 | Relief |
-| 35 | House | 12x12 | 29 | 6 | 154 | Relief |
-| 42 | Heart | 14x14 | 29 | 7 | 166 | Relief |
-| 49 | Ball | 13x13 | 38 | 7 | 176 | Relief |
-| 50 | Trophy | 22x22 | 49 | 9 | 218 | World Boss |
-| 56 | Square | 12x12 | 34 | 8 | 193 | Relief |
-| 63 | Triangle | 17x17 | 45 | 7 | 179 | Relief |
-| 70 | Cross | 16x16 | 36 | 6 | 167 | Relief |
-| 75 | Cross | 23x23 | 45 | 10 | 234 | World Boss |
-| 77 | Hexagon | 16x16 | 41 | 9 | 206 | Relief |
-| 84 | Flower | 19x19 | 44 | 7 | 187 | Relief |
-| 91 | Trophy | 20x20 | 52 | 11 | 243 | Relief |
-| 98 | Diamond | 20x20 | 56 | 7 | 187 | Relief |
-| 100 | Ball | 22x22 | 45 | 10 | 236 | World Boss |
-| 105 | Butterfly | 17x17 | 43 | 8 | 195 | Relief |
-| 112 | Star | 22x22 | 50 | 8 | 203 | Relief |
-| 119 | House | 19x19 | 45 | 8 | 202 | Relief |
-| 125 | Star | 32x32 | 68 | 12 | 273 | World Boss |
-| 126 | Heart | 20x20 | 56 | 10 | 234 | Relief |
-| 133 | Ball | 18x18 | 52 | 9 | 217 | Relief |
-| 140 | Square | 16x16 | 56 | 11 | 249 | Relief |
-| 147 | Triangle | 24x24 | 55 | 9 | 224 | Relief |
-| 150 | Trophy | 32x32 | 67 | 11 | 263 | World Boss |
-| 154 | Cross | 22x22 | 55 | 10 | 232 | Relief |
-| 161 | Hexagon | 21x21 | 57 | 8 | 209 | Relief |
-| 168 | Flower | 25x25 | 63 | 8 | 214 | Relief |
-| 175 | Trophy | 25x25 | 64 | 10 | 245 | World Boss |
+| 1 | Square | 5x5 | 3 | 2 | 58 | Tutorial |
+| 2 | Square | 5x5 | 4 | 3 | 81 | Tutorial |
+| 3 | Ball | 6x6 | 5 | 2 | 63 | Tutorial |
+| 4 | Diamond | 8x8 | 6 | 3 | 84 | Tutorial |
+| 5 | Heart | 8x8 | 8 | 4 | 100 | Tutorial |
+| 6 | Star | 9x9 | 12 | 6 | 131 | Standard |
+| 7 | Triangle | 9x9 | 12 | 6 | 132 | Standard |
+| 8 | Heart | 8x8 | 13 | 7 | 153 | Standard |
+| 9 | Hexagon | 8x8 | 11 | 6 | 134 | Standard |
+| 10 | Hourglass | 9x9 | 14 | 7 | 152 | Standard |
+| 14 | Square | 7x7 | 15 | 6 | 137 | Relief |
+| 21 | Shield | 10x10 | 15 | 6 | 147 | Relief |
+| 25 | Diamond | 14x14 | 24 | 7 | 162 | World Boss |
+| 28 | Crescent | 15x15 | 13 | 5 | 125 | Relief |
+| 35 | Octagon | 10x10 | 15 | 6 | 140 | Relief |
+| 42 | Hourglass | 13x13 | 19 | 8 | 175 | Relief |
+| 49 | Ball | 9x9 | 18 | 7 | 148 | Relief |
+| 50 | Triangle | 17x17 | 24 | 9 | 196 | World Boss |
+| 56 | Heart | 11x11 | 12 | 7 | 157 | Relief |
+| 63 | House | 11x11 | 16 | 8 | 172 | Relief |
+| 70 | Star | 14x14 | 20 | 7 | 164 | Relief |
+| 75 | Hourglass | 20x20 | 26 | 9 | 205 | World Boss |
+| 77 | Butterfly | 11x11 | 20 | 8 | 181 | Relief |
+| 84 | Diamond | 14x14 | 30 | 7 | 164 | Relief |
+| 91 | Trophy | 14x14 | 21 | 11 | 222 | Relief |
+| 98 | Flower | 14x14 | 26 | 7 | 163 | Relief |
+| 100 | Butterfly | 18x18 | 25 | 11 | 232 | World Boss |
+| 105 | Hexagon | 13x13 | 21 | 8 | 183 | Relief |
+| 112 | Cross | 13x13 | 25 | 8 | 174 | Relief |
+| 119 | Triangle | 15x15 | 26 | 7 | 162 | Relief |
+| 125 | Cross | 22x22 | 42 | 10 | 220 | World Boss |
+| 126 | Square | 11x11 | 19 | 8 | 186 | Relief |
+| 133 | Shield | 13x13 | 22 | 9 | 196 | Relief |
+| 140 | Crescent | 20x20 | 25 | 7 | 158 | Relief |
+| 147 | Octagon | 14x14 | 21 | 9 | 194 | Relief |
+| 150 | Octagon | 21x21 | 40 | 14 | 283 | World Boss |
+| 154 | Hourglass | 16x16 | 22 | 8 | 176 | Relief |
+| 161 | Ball | 13x13 | 24 | 9 | 194 | Relief |
+| 168 | Heart | 15x15 | 26 | 8 | 175 | Relief |
+| 175 | House | 15x15 | 21 | 8 | 182 | World Boss |

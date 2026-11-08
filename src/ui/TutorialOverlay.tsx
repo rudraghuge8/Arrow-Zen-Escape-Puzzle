@@ -42,14 +42,14 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
   };
 
   return (
-    <div className="fixed top-20 inset-x-0 mx-auto w-[min(90vw,380px)] z-20 pointer-events-none select-none">
-      <div className="flex items-center gap-3 bg-white/95 dark:bg-black/90 backdrop-blur-md border border-amber-500/40 rounded-2xl p-3 shadow-lg pointer-events-auto animate-bounce-subtle">
-        <Mascot mood="happy" size={42} />
+    <div className="relative mx-auto w-[min(92vw,390px)] z-10 pointer-events-none select-none px-2 my-1 shrink-0">
+      <div className="flex items-center gap-3 glass-card rounded-2xl p-3 shadow-lg pointer-events-auto border border-theme-subtle">
+        <Mascot mood="happy" size={38} />
         <div className="flex-1 text-left">
-          <p className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+          <p className="text-[10px] font-bold text-teal-500 uppercase tracking-wider">
             Tutorial · Step {levelNumber}/5
           </p>
-          <p className="text-xs leading-snug mt-0.5 font-medium opacity-90">
+          <p className="text-xs leading-snug mt-0.5 font-medium opacity-90 text-[var(--theme-text)]">
             {getTutorialMessage()}
           </p>
         </div>
@@ -57,7 +57,7 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
           <button
             onClick={onDismiss}
             aria-label="Dismiss tutorial hint"
-            className="w-7 h-7 flex items-center justify-center rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 text-xs font-bold active:scale-95 transition-transform"
+            className="w-7 h-7 flex items-center justify-center rounded-lg glass-button text-xs font-bold active:scale-95 transition-transform text-[var(--theme-text)]"
           >
             <X className="w-3.5 h-3.5" />
           </button>

@@ -39,17 +39,17 @@ export const LevelPathScreen: React.FC<LevelPathScreenProps> = ({
   }, [unlockedLevel]);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#f5e7d3] dark:bg-[#1c242d] text-[#6b4528] dark:text-[#9fb0cb] select-none">
+    <div className="w-full h-full flex flex-col bg-transparent text-[var(--theme-text)] select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 bg-inherit sticky top-0 z-20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle glass-panel-subtle sticky top-0 z-20">
         <button
           onClick={onBack}
           aria-label="Back"
-          className="w-11 h-11 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-90 transition-transform text-slate-800 dark:text-slate-100 shadow-xs"
+          className="w-11 h-11 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('levels')}</h2>
+        <h2 className="text-lg font-bold text-[var(--theme-text)] tracking-wide">{t('levels')}</h2>
         <div className="w-11" />
       </div>
 
@@ -63,19 +63,19 @@ export const LevelPathScreen: React.FC<LevelPathScreenProps> = ({
           return (
             <div
               key={world.index}
-              className={`rounded-3xl p-4 border transition-all ${
+              className={`rounded-3xl p-4.5 transition-all border border-theme-subtle ${
                 isWorldUnlocked
-                  ? 'bg-white/60 dark:bg-black/30 border-black/10 dark:border-white/10 shadow-sm'
-                  : 'bg-black/5 dark:bg-white/5 border-transparent opacity-60'
+                  ? 'glass-card'
+                  : 'glass-panel-subtle opacity-50'
               }`}
             >
               {/* World Header */}
               <div className="flex items-center justify-between mb-3 px-1">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider opacity-60">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-teal-500">
                     World {world.index + 1}
                   </span>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">{world.name}</h3>
+                  <h3 className="text-base font-bold text-[var(--theme-text)]">{world.name}</h3>
                 </div>
                 <span className="text-xs font-semibold opacity-75">
                   Levels {startL}–{endL}
@@ -98,12 +98,12 @@ export const LevelPathScreen: React.FC<LevelPathScreenProps> = ({
                       disabled={!isUnlocked}
                       onClick={() => onSelectLevel(levelNum)}
                       aria-label={`Level ${levelNum}${stars ? `, ${stars} stars` : ''}${!isUnlocked ? ', locked' : ''}`}
-                      className={`relative min-h-[50px] flex flex-col items-center justify-center py-2 rounded-2xl font-bold transition-all ${
+                      className={`relative min-h-[50px] flex flex-col items-center justify-center py-2 rounded-2xl font-bold transition-all border border-theme-subtle ${
                         isCurrent
-                          ? 'bg-[#c0773a] text-white shadow-md scale-105 ring-2 ring-amber-400'
+                          ? 'bg-linear-to-r from-teal-500 to-cyan-500 text-white shadow-lg glass-glow-cyan scale-105 ring-2 ring-cyan-300'
                           : isUnlocked
-                            ? 'bg-black/5 dark:bg-white/10 hover:bg-black/10 text-inherit'
-                            : 'bg-black/5 text-black/20 dark:text-white/20 cursor-not-allowed'
+                            ? 'glass-button text-[var(--theme-text)] hover:scale-105 active:scale-95'
+                            : 'bg-black/5 dark:bg-white/5 text-black/20 dark:text-white/20 cursor-not-allowed border-transparent'
                       }`}
                     >
                       <span className="text-sm">{levelNum}</span>
@@ -126,7 +126,7 @@ export const LevelPathScreen: React.FC<LevelPathScreenProps> = ({
                       {/* Boss badge */}
                       {isBoss && (
                         <div className="absolute -top-1 -right-1">
-                          <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-400 drop-shadow-xs" />
+                          <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-300 drop-shadow-md" />
                         </div>
                       )}
                     </button>

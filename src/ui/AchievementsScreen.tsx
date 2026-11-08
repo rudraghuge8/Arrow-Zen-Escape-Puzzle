@@ -86,17 +86,17 @@ export const AchievementsScreen: React.FC<AchievementsScreenProps> = (props) => 
     getTranslation(language, key, params);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#f5e7d3] dark:bg-[#1c242d] text-[#6b4528] dark:text-[#9fb0cb] select-none">
+    <div className="w-full h-full flex flex-col bg-transparent text-[var(--theme-text)] select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10 bg-inherit sticky top-0 z-20">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-theme-subtle glass-panel-subtle sticky top-0 z-20">
         <button
           onClick={onBack}
           aria-label="Back"
-          className="w-11 h-11 flex items-center justify-center rounded-xl bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 active:scale-90 transition-transform text-slate-800 dark:text-slate-100 shadow-xs"
+          className="w-11 h-11 flex items-center justify-center rounded-xl glass-button active:scale-90 transition-transform text-[var(--theme-text)] border border-theme-subtle"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('achievements')}</h2>
+        <h2 className="text-lg font-bold text-[var(--theme-text)] tracking-wide">{t('achievements')}</h2>
         <div className="w-11" />
       </div>
 
@@ -110,32 +110,32 @@ export const AchievementsScreen: React.FC<AchievementsScreenProps> = (props) => 
           return (
             <div
               key={ach.id}
-              className={`p-4 rounded-2xl border flex items-center justify-between transition-all ${
+              className={`p-4 rounded-2xl flex items-center justify-between transition-all border border-theme-subtle ${
                 unlocked
-                  ? 'bg-white/60 dark:bg-black/30 border-black/10 dark:border-white/10'
-                  : 'bg-black/5 dark:bg-white/5 border-transparent opacity-60'
+                  ? 'glass-card'
+                  : 'glass-panel-subtle opacity-50'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10 shrink-0">
+                <div className="w-12 h-12 flex items-center justify-center rounded-xl glass-panel-subtle shrink-0 border border-theme-subtle">
                   <Icon />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">{ach.title}</h4>
+                  <h4 className="font-bold text-sm text-[var(--theme-text)]">{ach.title}</h4>
                   <p className="text-xs opacity-70 mt-0.5">{ach.desc}</p>
                 </div>
               </div>
 
               <div>
                 {claimed ? (
-                  <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="flex items-center gap-1 text-xs font-bold text-emerald-400">
                     <Check className="w-4 h-4" />
                     <span>Claimed</span>
                   </span>
                 ) : unlocked ? (
                   <button
                     onClick={() => onClaimReward(ach.id, ach.rewardCoins)}
-                    className="min-h-[44px] px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5"
+                    className="min-h-[44px] px-3.5 py-1.5 bg-linear-to-r from-teal-500 to-cyan-500 hover:brightness-110 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md glass-glow-cyan transition-all flex items-center gap-1.5"
                   >
                     <span>Claim +{ach.rewardCoins}</span>
                     <CoinIcon size={14} />

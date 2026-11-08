@@ -81,7 +81,7 @@ export interface SolverResult {
 
 export type ArrowSkinId = 'round' | 'sharp' | 'neon' | 'pixel';
 
-export type ThemeId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type ThemeId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export interface ThemeColors {
   id: ThemeId;

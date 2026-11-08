@@ -254,7 +254,7 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
     wakeLoop();
   }, [levelData, theme, wakeLoop]);
 
-  // Pre-render static board mask & dot grid onto an offscreen canvas
+  // Pre-render tactile puzzle box container, shape perimeter rim, and recessed cell bed onto offscreen canvas
   const renderOffscreenGrid = useCallback(() => {
     const s = stateRef.current;
     const n = s.gridSize;
@@ -266,7 +266,8 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
     const minDim = Math.min(rect.width || 360, rect.height || 360) - 24;
     s.cellSize = Math.max(16, Math.min(48, Math.floor(minDim / (n + 2))));
 
-    const boardPx = (n + 2) * s.cellSize;
+    const cs = s.cellSize;
+    const boardPx = (n + 2) * cs;
     if (!offscreenCanvasRef.current) {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
@@ -279,24 +280,29 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, boardPx, boardPx);
 
-    // Subtle tactile paper texture dots & shape boundary
     const mask = levelData.shapeMask;
-    ctx.fillStyle = theme.line;
-    ctx.globalAlpha = 0.12;
+    const isGlass = theme.id === 8;
 
+    // Minimal, organic Zen grid pins: NO box boundary, border, or rim around the arrows
+    ctx.save();
     for (let y = 0; y < n; y++) {
       for (let x = 0; x < n; x++) {
-        if (mask[y * n + x]) {
-          const cx = (x + 1.5) * s.cellSize;
-          const cy = (y + 1.5) * s.cellSize;
-          ctx.beginPath();
-          ctx.arc(cx, cy, s.cellSize * 0.08, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        if (!mask[y * n + x]) continue;
+
+        const px = (x + 1) * cs;
+        const py = (y + 1) * cs;
+        const cx = px + cs * 0.5;
+        const cy = py + cs * 0.5;
+
+        // Subtle tactile locator dot at cell centers
+        ctx.fillStyle = theme.line;
+        ctx.globalAlpha = isGlass ? 0.20 : 0.10;
+        ctx.beginPath();
+        ctx.arc(cx, cy, cs * 0.06, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
-
-    ctx.globalAlpha = 1.0;
+    ctx.restore();
   }, [levelData, theme]);
 
   // Main render loop with idle sleeping and smooth physics
@@ -1003,6 +1009,9 @@ function drawTactileArrow(
   } else if (skin === 'neon') {
     baseColor = '#38bdf8'; // Electric cyan
     highlightColor = '#e0f2fe';
+  } else if (theme.id === 8) {
+    baseColor = '#e2e8f0'; // Crystalline frosted glass
+    highlightColor = '#ffffff';
   }
 
   // Continuous parametric trajectory sampling for liquid sub-pixel smooth movement
@@ -1025,14 +1034,56 @@ function drawTactileArrow(
     ];
   };
 
-  // Sample points along trajectory
+  // Sample points along trajectory with high parametric density during motion
   const points: [number, number][] = [];
   const startParam = Math.max(0, slide);
-  for (let i = 0; i < k; i++) {
-    points.push(sampleTraj(startParam + i));
+
+  if (arrow.isMoving || isCurved) {
+    // Dense sub-cell parametric sampling (10-14 samples per cell)
+    // Ensures fluid, liquid bending around 90-degree corners with no linear kinks!
+    const sampleCount = Math.max(k * 10, 24);
+    for (let i = 0; i < sampleCount; i++) {
+      const t = startParam + (i / (sampleCount - 1)) * (k - 1);
+      points.push(sampleTraj(t));
+    }
+  } else {
+    for (let i = 0; i < k; i++) {
+      points.push(sampleTraj(startParam + i));
+    }
   }
 
   if (points.length < 2) return;
+
+  // Luminous slipstream contrail ribbon trailing behind the arrow tail during escape
+  if (arrow.isMoving && startParam > 0.08) {
+    const trailSpan = Math.min(startParam, 2.8);
+    const trailSamples = 18;
+    const trailPts: [number, number][] = [];
+    for (let i = 0; i < trailSamples; i++) {
+      const t = Math.max(0, startParam - trailSpan + (i / (trailSamples - 1)) * trailSpan);
+      trailPts.push(sampleTraj(t));
+    }
+    if (trailPts.length >= 2) {
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const trailGrad = ctx.createLinearGradient(
+        trailPts[0][0], trailPts[0][1],
+        trailPts[trailPts.length - 1][0], trailPts[trailPts.length - 1][1]
+      );
+      trailGrad.addColorStop(0, 'rgba(16, 185, 129, 0)');
+      trailGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.40)');
+      trailGrad.addColorStop(1, 'rgba(16, 185, 129, 0.85)');
+      ctx.strokeStyle = trailGrad;
+      ctx.lineWidth = cs * 0.16;
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = cs * 0.38;
+      ctx.beginPath();
+      buildPath(ctx, trailPts, true);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
 
   // Press-squish physics (mechanical depression + damped harmonic rebound spring)
   let squish = 1.0;
@@ -1082,8 +1133,33 @@ function drawTactileArrow(
     pt[1] = cy + (pt[1] - cy) * squish + jitterY;
   }
 
-  // Volume-conserving tube width (widens when compressed)
-  const tubeWidth = Math.max(3.2, cs * (isCurved ? 0.22 : 0.17)) * (2 - squish);
+  // Aerodynamic Velocity Elongation (squash & stretch during mid-flight)
+  let speedStretch = 0;
+  if (arrow.isMoving) {
+    const p = arrow.moveProgress;
+    if (p > 0.08 && p < 0.90) {
+      speedStretch = Math.sin(((p - 0.08) / 0.82) * Math.PI) * 0.22;
+    }
+  }
+
+  // Elongate tip forward along current motion heading
+  const headPoint = points[points.length - 1];
+  const prevPoint = points[points.length - 2];
+  const motionDx = headPoint[0] - prevPoint[0];
+  const motionDy = headPoint[1] - prevPoint[1];
+  const motionDist = Math.hypot(motionDx, motionDy);
+  const headAngle = Math.atan2(motionDy, motionDx);
+
+  if (speedStretch > 0 && motionDist > 0.001) {
+    headPoint[0] += (motionDx / motionDist) * (cs * speedStretch);
+    headPoint[1] += (motionDy / motionDist) * (cs * speedStretch);
+  }
+
+  // Volume-conserving tube width (widens when compressed, slims when running fast)
+  const tubeWidth =
+    Math.max(3.2, cs * (isCurved ? 0.22 : 0.17)) *
+    (2 - squish) *
+    (1 - speedStretch * 0.20);
 
   ctx.save();
   ctx.lineCap = isCurved ? 'round' : 'butt';
@@ -1161,16 +1237,27 @@ function drawTactileArrow(
     drawFlowChevrons(ctx, points, cs, now, baseColor, isHighlighted);
   }
 
+  // 5b. Sonic Bow-Shock Wave Arc ahead of head during flight
+  if (arrow.isMoving && speedStretch > 0.05) {
+    ctx.save();
+    ctx.translate(headPoint[0], headPoint[1]);
+    ctx.rotate(headAngle);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.lineWidth = 1.8;
+    ctx.shadowColor = '#38bdf8';
+    ctx.shadowBlur = cs * 0.28;
+    ctx.beginPath();
+    ctx.arc(cs * 0.22, 0, cs * 0.30, -Math.PI * 0.36, Math.PI * 0.36);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // 6. Sculpted Aerodynamic Arrowhead
-  const head = points[points.length - 1];
-  const prev = points[points.length - 2];
-  const angle = Math.atan2(head[1] - prev[1], head[0] - prev[0]);
-
   ctx.save();
-  ctx.translate(head[0], head[1]);
-  ctx.rotate(angle);
+  ctx.translate(headPoint[0], headPoint[1]);
+  ctx.rotate(headAngle);
 
-  const headSize = cs * (skin === 'pixel' ? 0.48 : 0.42);
+  const headSize = cs * (skin === 'pixel' ? 0.48 : 0.42) * (1 + speedStretch * 0.2);
   renderCanvasSkinHead(ctx, skin, headSize, baseColor, highlightColor);
 
   ctx.restore();
@@ -1248,3 +1335,4 @@ function drawFlowChevrons(
 
   ctx.restore();
 }
+

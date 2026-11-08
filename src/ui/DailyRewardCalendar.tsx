@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { X, Gift, Check } from 'lucide-react';
+import { ArrowLeft, Gift, Check } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { getTranslation, type LanguageCode } from '../i18n/translations';
 import { CoinIcon, BombIcon } from './GameIcons';
@@ -46,20 +46,21 @@ export const DailyRewardCalendar: React.FC<DailyRewardCalendarProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="calendar-heading"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in"
     >
-      <div className="relative w-full max-w-sm bg-[#fcf6ee] dark:bg-[#252f3b] text-[#6b4528] dark:text-[#e2e8f0] rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4 text-center border border-black/10 dark:border-white/10">
+      <div className="relative w-full max-w-sm glass-card text-[var(--theme-text)] rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4 text-center border border-theme-subtle">
+        {/* Top-left back button */}
         <button
           onClick={onClose}
-          aria-label="Close"
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 transition-transform active:scale-95"
+          aria-label="Back"
+          className="absolute top-4 left-4 w-9 h-9 flex items-center justify-center rounded-xl glass-button transition-transform active:scale-90 text-[var(--theme-text)] border border-theme-subtle cursor-pointer z-10"
         >
-          <X className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" />
         </button>
 
         <Mascot mood="cheering" size={60} />
 
-        <h2 id="calendar-heading" className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+        <h2 id="calendar-heading" className="text-2xl font-bold tracking-tight text-[var(--theme-text)]">
           {t('dailyReward')}
         </h2>
 
@@ -76,10 +77,10 @@ export const DailyRewardCalendar: React.FC<DailyRewardCalendarProps> = ({
                   r.day === 7 ? 'col-span-2' : ''
                 } ${
                   isReady
-                    ? 'bg-amber-500/20 border-amber-500 text-amber-700 dark:text-amber-300 ring-2 ring-amber-400 font-bold animate-pulse'
+                    ? 'glass-card border-amber-400 text-amber-300 ring-2 ring-amber-400 font-bold animate-pulse shadow-md'
                     : isClaimed
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 opacity-80'
-                      : 'bg-black/5 dark:bg-white/5 border-transparent opacity-50'
+                      ? 'glass-panel-subtle border-emerald-500/30 text-emerald-400 opacity-80'
+                      : 'glass-panel-subtle border-transparent opacity-50'
                 }`}
               >
                 <span className="text-[10px] uppercase font-bold opacity-75">
@@ -120,7 +121,7 @@ export const DailyRewardCalendar: React.FC<DailyRewardCalendarProps> = ({
                 const target = REWARDS[currentClaimDay - 1];
                 onClaim(currentClaimDay, target.coins);
               }}
-              className="w-full min-h-[48px] py-3.5 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white font-bold text-base rounded-2xl shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full min-h-[48px] py-3.5 bg-linear-to-r from-amber-500 to-amber-600 hover:brightness-110 active:scale-[0.98] text-white font-bold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2"
             >
               <Gift className="w-5 h-5" />
               <span>{t('claimDailyReward', { day: currentClaimDay })}</span>
@@ -128,7 +129,7 @@ export const DailyRewardCalendar: React.FC<DailyRewardCalendarProps> = ({
           ) : (
             <button
               disabled
-              className="w-full min-h-[48px] py-3.5 bg-black/10 text-inherit opacity-60 font-bold rounded-2xl cursor-not-allowed flex items-center justify-center gap-2 text-xs"
+              className="w-full min-h-[48px] py-3.5 glass-button opacity-60 font-bold rounded-2xl cursor-not-allowed flex items-center justify-center gap-2 text-xs"
             >
               <Check className="w-4 h-4" />
               <span>Claimed for today! Next reward tomorrow</span>

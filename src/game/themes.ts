@@ -78,6 +78,15 @@ export const THEMES: readonly ThemeColors[] = [
     accent: '#000000',
     cardBg: '#ffffff',
   },
+  {
+    id: 8,
+    name: 'Glassmorphism',
+    bg: '#0a0f1d',
+    line: '#e2e8f0',
+    drop: '#38bdf8',
+    accent: '#2dd4bf',
+    cardBg: 'rgba(255, 255, 255, 0.10)',
+  },
 ] as const;
 
 export function getTheme(id: ThemeId): ThemeColors {
@@ -122,4 +131,15 @@ export function validateAllThemeContrasts(): boolean {
     }
   }
   return true;
+}
+
+/**
+ * Determines whether a theme has a light background.
+ * For light themes, text across the UI adapts to the theme's dark line color.
+ */
+export function isThemeLight(theme: ThemeColors): boolean {
+  if (theme.bg.startsWith('rgba') || theme.bg.startsWith('rgb')) {
+    return false;
+  }
+  return getLuminance(theme.bg) > 0.35;
 }
