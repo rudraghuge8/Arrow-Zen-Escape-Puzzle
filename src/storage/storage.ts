@@ -82,14 +82,14 @@ class StorageManager {
         if (parsed && parsed.version === 2) {
           // Merge with defaults to ensure any newly added fields exist
           const mergedThemes = Array.isArray(parsed.unlockedThemes)
-            ? Array.from(new Set([...parsed.unlockedThemes, 8]))
+            ? Array.from(new Set([...parsed.unlockedThemes, 0]))
             : DEFAULT_STORAGE_DATA.unlockedThemes;
 
           return {
             ...DEFAULT_STORAGE_DATA,
             ...parsed,
             unlockedThemes: mergedThemes,
-            activeTheme: parsed.activeTheme !== undefined ? parsed.activeTheme : 8,
+            activeTheme: (parsed.activeTheme !== undefined && parsed.activeTheme !== 8) ? parsed.activeTheme : 0,
             todayStats: {
               ...DEFAULT_STORAGE_DATA.todayStats,
               ...(parsed.todayStats || {}),

@@ -114,7 +114,7 @@ export const HUD: React.FC<HUDProps> = ({
               <span className="font-extrabold">{clampedUnlocked}</span>
               <span className="opacity-50">/</span>
               <span className="opacity-75">500</span>
-              <span className="text-[10px] font-black text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 dark:bg-cyan-400/20 px-1.5 py-0.5 rounded-md ml-0.5">
+              <span className="text-[10px] font-bold text-white bg-[#28605d] px-2 py-0.5 rounded-md ml-0.5 shadow-xs">
                 {progressPercent.toFixed(0)}%
               </span>
             </div>
@@ -122,7 +122,7 @@ export const HUD: React.FC<HUDProps> = ({
 
           {/* Progress Track */}
           <div
-            className="relative w-full h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden border border-white/20 dark:border-white/10 p-[1px]"
+            className="relative w-full h-2 rounded-full bg-[#e8e2d5] overflow-hidden border border-[#dcd4c3] p-[1px]"
             role="progressbar"
             aria-valuenow={clampedUnlocked}
             aria-valuemin={1}
@@ -131,19 +131,16 @@ export const HUD: React.FC<HUDProps> = ({
           >
             {/* World Milestone Notch Markers at 100, 200, 300, 400 */}
             <div className="absolute inset-0 pointer-events-none flex justify-between px-[20%]">
-              <div className="w-[1px] h-full bg-white/40 z-10" />
-              <div className="w-[1px] h-full bg-white/40 z-10" />
-              <div className="w-[1px] h-full bg-white/40 z-10" />
+              <div className="w-[1px] h-full bg-white/60 z-10" />
+              <div className="w-[1px] h-full bg-white/60 z-10" />
+              <div className="w-[1px] h-full bg-white/60 z-10" />
             </div>
 
             {/* Animated Fill Bar */}
             <div
-              className="h-full rounded-full bg-gradient-to-r from-teal-400 via-cyan-400 to-amber-400 transition-all duration-700 ease-out shadow-xs relative"
+              className="h-full rounded-full bg-gradient-to-r from-[#266b62] to-[#d6a654] transition-all duration-700 ease-out shadow-xs relative"
               style={{ width: `${progressPercent}%` }}
-            >
-              {/* Luminous Leading Head Glow */}
-              <div className="absolute right-0 top-0 bottom-0 w-2.5 bg-white/90 rounded-full blur-[1px]" />
-            </div>
+            />
           </div>
         </div>
       </div>

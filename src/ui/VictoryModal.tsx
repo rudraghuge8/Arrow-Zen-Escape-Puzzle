@@ -51,10 +51,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
 
   // Stagger star appearance and coin counter
   useEffect(() => {
-    soundEngine.playSfx('win');
-    soundEngine.vibrate([30, 40, 30]);
-
-    // Star animation delays
+    // Star animation delays (victory fanfare is triggered directly in handleArrowEscaped)
     for (let i = 1; i <= stars; i++) {
       setTimeout(() => {
         setAnimatedStars(i);
@@ -131,7 +128,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="victory-heading"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-fade-in"
     >
       {/* Comprehensive Multi-Type Celebration Effects Engine */}
       <CelebrationEffects
@@ -141,7 +138,10 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
         onModeChange={setCelebrationMode}
       />
 
-      <div className="relative z-10 w-full max-w-sm glass-card text-[var(--theme-text)] rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-3.5 text-center border border-theme-subtle backdrop-blur-2xl">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative z-40 w-full max-w-sm glass-card text-[var(--theme-text)] rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-3.5 text-center border border-theme-subtle pointer-events-auto"
+      >
         {/* Top-left back button */}
         <button
           onClick={onGoToLevels}
@@ -294,7 +294,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
         <div className="w-full flex flex-col gap-2.5 pt-1">
           <button
             onClick={onNextLevel}
-            className="w-full min-h-[48px] py-3.5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:brightness-110 active:scale-[0.98] text-white font-extrabold text-lg rounded-2xl shadow-xl shadow-cyan-500/25 border border-white/40 transition-all backdrop-blur-md cursor-pointer"
+            className="w-full min-h-[48px] py-3.5 bg-[#266b62] hover:bg-[#1d554e] active:scale-[0.98] text-white font-extrabold text-lg rounded-2xl shadow-lg shadow-[#266b62]/20 border border-[#266b62]/40 transition-all cursor-pointer"
           >
             {levelNumber < 500 ? t('nextLevel') : t('levels')}
           </button>

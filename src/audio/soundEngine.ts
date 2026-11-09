@@ -96,6 +96,7 @@ class SoundEngine {
 
   private initCtx(): boolean {
     if (this.audioCtx) return true;
+    if (typeof window === 'undefined') return false;
     try {
       const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtxClass) return false;
@@ -205,7 +206,10 @@ class SoundEngine {
     }
   }
 
-  public playSfx(name: 'go' | 'no' | 'win' | 'coin' | 'tap' | 'booster' | 'button' | 'undo', comboCount = 0): void {
+  public playSfx(
+    name: 'go' | 'no' | 'win' | 'fanfare' | 'coin' | 'tap' | 'booster' | 'button' | 'undo',
+    comboCount = 0
+  ): void {
     if (!this.soundEnabled) return;
     this.unlock();
 
@@ -218,11 +222,25 @@ class SoundEngine {
       case 'no':
         this.playTone(180, 0.28, 'sawtooth', 0.1, 75);
         break;
-      case 'win':
-        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
-          setTimeout(() => this.playTone(freq, 0.35, 'triangle', 0.16), idx * 110);
+      case 'fanfare':
+      case 'win': {
+        // Triumphant multi-stage victory fanfare: C5 -> E5 -> G5 -> C6 peak with rich sustained major triad harmony & shimmering upper harmonics
+        const notes = [
+          { freq: 523.25, time: 0, dur: 0.18, type: 'triangle' as OscillatorType, gain: 0.22 }, // C5
+          { freq: 659.25, time: 0.12, dur: 0.18, type: 'triangle' as OscillatorType, gain: 0.24 }, // E5
+          { freq: 783.99, time: 0.24, dur: 0.20, type: 'triangle' as OscillatorType, gain: 0.26 }, // G5
+          { freq: 1046.50, time: 0.38, dur: 0.65, type: 'triangle' as OscillatorType, gain: 0.30 }, // C6 (Peak)
+          // Sustained chord harmonics
+          { freq: 523.25, time: 0.38, dur: 0.65, type: 'sine' as OscillatorType, gain: 0.18 }, // C5 base
+          { freq: 783.99, time: 0.38, dur: 0.65, type: 'sine' as OscillatorType, gain: 0.20 }, // G5 harmony
+          { freq: 1318.51, time: 0.44, dur: 0.55, type: 'sine' as OscillatorType, gain: 0.14 }, // E6 sparkle
+        ];
+        notes.forEach(({ freq, time, dur, type, gain }) => {
+          setTimeout(() => this.playTone(freq, dur, type, gain), time * 1000);
         });
+        this.vibrate([40, 50, 40, 90]);
         break;
+      }
       case 'coin':
         this.playTone(987.77, 0.1, 'sine', 0.18);
         setTimeout(() => this.playTone(1318.51, 0.2, 'sine', 0.2), 90);
@@ -240,6 +258,10 @@ class SoundEngine {
         this.playTone(700, 0.15, 'sine', 0.12, 350);
         break;
     }
+  }
+
+  public playFanfare(): void {
+    this.playSfx('fanfare');
   }
 
   public vibrate(pattern: number | number[]): void {

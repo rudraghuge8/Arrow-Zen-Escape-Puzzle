@@ -94,60 +94,69 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Hero Centerpiece: Frosted Glassmorphism Card + Mascot + Title */}
-      <div className="flex flex-col items-center justify-center my-3 py-5 px-5 text-center gap-3.5 glass-card rounded-3xl backdrop-blur-2xl border border-theme-subtle shadow-xl shrink-0">
-        <div className="relative">
-          <Mascot mood="zen" size={84} />
-          {/* Subtle floating background arrows with chromatic glow */}
-          <svg
-            className="absolute -top-3 -left-7 w-7 h-7 text-cyan-400/40 animate-pulse pointer-events-none drop-shadow"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-          >
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-          <svg
-            className="absolute -bottom-2 -right-7 w-6 h-6 text-teal-400/40 animate-pulse pointer-events-none drop-shadow"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-          >
-            <path d="M12 19V5M5 12l7-7 7 7" />
-          </svg>
+      {/* Hero Centerpiece: Editorial Card matching reference image */}
+      <div className="flex flex-col items-center justify-center my-3 py-5 px-5 text-center gap-3.5 glass-card rounded-3xl border border-theme-subtle shadow-lg shrink-0">
+        {/* Brand Header Chip matching reference logo */}
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5efe6] border border-[#e8e2d5]">
+          <div className="w-6 h-6 rounded-lg bg-[#1f2421] flex items-center justify-center text-[#cca053] shadow-xs">
+            <svg viewBox="0 0 24 24" width={14} height={14} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" transform="rotate(45 12 12)" stroke="#cca053" />
+              <path d="M12 7v10M7 12h10" stroke="#f4efe6" strokeWidth={2} />
+            </svg>
+          </div>
+          <div className="text-left leading-tight">
+            <span className="text-xs font-extrabold text-[#1f2421] block tracking-tight">ArrowsGame.io</span>
+            <span className="text-[10px] text-[#5a6265] block font-medium">Free puzzle game online</span>
+          </div>
+        </div>
+
+        <div className="relative my-1">
+          <Mascot mood="zen" size={76} />
         </div>
 
         <div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-serif text-[var(--theme-text)] drop-shadow-xs">
-            {t('appTitle')}
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-serif text-[#1f2421]">
+            Arrows Game
           </h1>
-          <p className="text-xs text-[var(--theme-text)] font-semibold mt-1 max-w-[280px] mx-auto leading-relaxed opacity-85">
-            {t('appSubtitle')}
+          <h2 className="text-sm sm:text-base font-bold text-[#266b62] mt-0.5">
+            Free Arrow Puzzle Game
+          </h2>
+          <p className="text-xs text-[#5a6265] font-medium mt-1 max-w-[280px] mx-auto leading-relaxed">
+            Clear paths, release arrows, and beat each board.
           </p>
         </div>
 
-        {/* Primary Play CTA with Luminous Glass Gradient */}
+        {/* Category Tag Pills directly matching reference image */}
+        <div className="flex flex-wrap items-center justify-center gap-1.5 mt-0.5">
+          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#1b2228] text-white shadow-xs">
+            Arrow Game
+          </span>
+          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#28605d] text-white shadow-xs">
+            Puzzle Game
+          </span>
+          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#d6a654] text-white shadow-xs">
+            Timed Challenge
+          </span>
+        </div>
+
+        {/* Primary Play CTA with Editorial Rich Teal Solid Button */}
         <button
           onClick={onPlayCurrentLevel}
-          className="w-full mt-2 py-3.5 px-6 bg-gradient-to-r from-teal-500 to-cyan-500 hover:brightness-110 active:scale-[0.98] text-white font-extrabold text-lg sm:text-xl rounded-2xl shadow-xl shadow-cyan-500/25 border border-white/40 transition-all flex items-center justify-center gap-3 backdrop-blur-md"
+          className="w-full mt-2 py-3.5 px-6 bg-[#266b62] hover:bg-[#1d554e] active:scale-[0.98] text-white font-extrabold text-lg sm:text-xl rounded-2xl shadow-lg shadow-[#266b62]/25 border border-[#266b62]/30 transition-all flex items-center justify-center gap-3 cursor-pointer"
         >
           <Play className="w-6 h-6 fill-current" />
           <span>{t('playLevel', { level: Math.min(500, unlockedLevel) })}</span>
         </button>
 
-        {/* Glassmorphic Progress bar */}
+        {/* Clean Editorial Progress bar */}
         <div className="w-full mt-1">
-          <div className="w-full h-2.5 glass-panel-subtle rounded-full overflow-hidden p-0.5 border border-theme-subtle">
+          <div className="w-full h-2.5 bg-[#f5efe6] rounded-full overflow-hidden p-0.5 border border-[#e8e2d5]">
             <div
-              className="h-full bg-gradient-to-r from-sky-400 to-teal-400 rounded-full transition-all duration-500 shadow-sm"
+              className="h-full bg-gradient-to-r from-[#266b62] to-[#d6a654] rounded-full transition-all duration-500 shadow-xs"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <p className="text-[11px] text-[var(--theme-text)] mt-1.5 font-bold">
+          <p className="text-[11px] text-[#5a6265] mt-1.5 font-bold">
             {t('levelsCleared')}: {clearedCount} / 500 ({progressPercent}%)
           </p>
         </div>

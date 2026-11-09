@@ -298,7 +298,7 @@ export const CelebrationEffects: React.FC<CelebrationEffectsProps> = ({
   return (
     <div
       onClick={handleContainerClick}
-      className={`fixed inset-0 pointer-events-auto overflow-hidden select-none z-40 ${className}`}
+      className={`fixed inset-0 pointer-events-none overflow-hidden select-none z-10 ${className}`}
       aria-hidden="true"
     >
       <style>{`

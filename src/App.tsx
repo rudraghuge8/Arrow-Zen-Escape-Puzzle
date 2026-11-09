@@ -268,6 +268,10 @@ export default function App() {
       setIsWon(true);
       setMascotMood('cheering');
 
+      // Play triumphant fanfare success sound specifically for level win
+      soundEngine.playSfx('fanfare');
+      soundEngine.vibrate([40, 50, 40, 90]);
+
       const currentLvl = currentLevelData?.levelNumber || 1;
       const dropsLost = maxLives - lives;
       const stars = calculateStars(dropsLost, movesCount + 1, currentLevelData?.par || 4);
@@ -424,41 +428,29 @@ export default function App() {
 
   return (
     <div
-      className="relative w-screen h-screen overflow-hidden flex flex-col font-sans select-none"
+      className="relative w-full h-full min-h-screen overflow-hidden flex flex-col font-sans select-none editorial-grid-bg"
       style={{
         backgroundColor: currentTheme.bg,
         color: currentTheme.line,
       }}
     >
-      {/* Glassmorphic Ambient Luminous Chromatic Light Orbs */}
+      {/* Subtle organic warm background contours matching editorial reference */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div
-          className={`absolute -top-[12%] -left-[10%] w-[380px] h-[380px] rounded-full blur-[90px] animate-pulse ${
-            isLight ? 'opacity-20' : 'opacity-40'
-          }`}
-          style={{
-            background: 'radial-gradient(circle, #38bdf8 0%, #6366f1 70%, transparent 100%)',
-            animationDuration: '8s',
-          }}
-        />
-        <div
-          className={`absolute top-[35%] -right-[15%] w-[360px] h-[360px] rounded-full blur-[85px] animate-pulse ${
-            isLight ? 'opacity-15' : 'opacity-35'
-          }`}
-          style={{
-            background: 'radial-gradient(circle, #a855f7 0%, #ec4899 70%, transparent 100%)',
-            animationDuration: '11s',
-          }}
-        />
-        <div
-          className={`absolute -bottom-[12%] left-[15%] w-[390px] h-[390px] rounded-full blur-[95px] animate-pulse ${
-            isLight ? 'opacity-15' : 'opacity-30'
-          }`}
-          style={{
-            background: 'radial-gradient(circle, #2dd4bf 0%, #06b6d4 70%, transparent 100%)',
-            animationDuration: '9s',
-          }}
-        />
+        <svg
+          viewBox="0 0 1440 900"
+          className="w-full h-full object-cover opacity-25"
+          fill="none"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M -100,200 C 300,100 600,450 1100,220 C 1350,110 1500,320 1600,300 L 1600,1000 L -100,1000 Z"
+            fill="#e8dfd1"
+          />
+          <path
+            d="M 200,-50 C 600,50 900,-80 1300,80 C 1500,160 1600,50 1700,100 L 1700,-100 L 200,-100 Z"
+            fill="#ebe2d5"
+          />
+        </svg>
       </div>
 
       {/* Global Screen Cross-Fade Transition Overlay */}

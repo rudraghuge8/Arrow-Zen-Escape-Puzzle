@@ -281,10 +281,12 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
     ctx.clearRect(0, 0, boardPx, boardPx);
 
     const mask = levelData.shapeMask;
-    const isGlass = theme.id === 8;
 
-    // Minimal, organic Zen grid pins: NO box boundary, border, or rim around the arrows
+    // Clean Editorial grid: subtle grid lines and warm locator dots matching reference
     ctx.save();
+    ctx.strokeStyle = 'rgba(185, 175, 160, 0.28)';
+    ctx.lineWidth = 1;
+
     for (let y = 0; y < n; y++) {
       for (let x = 0; x < n; x++) {
         if (!mask[y * n + x]) continue;
@@ -294,12 +296,16 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
         const cx = px + cs * 0.5;
         const cy = py + cs * 0.5;
 
-        // Subtle tactile locator dot at cell centers
-        ctx.fillStyle = theme.line;
-        ctx.globalAlpha = isGlass ? 0.20 : 0.10;
+        // Subtle grid cell outline
+        ctx.strokeRect(px, py, cs, cs);
+
+        // Warm tactile locator dot at cell centers
+        ctx.fillStyle = '#bdb5a4';
+        ctx.globalAlpha = 0.55;
         ctx.beginPath();
-        ctx.arc(cx, cy, cs * 0.06, 0, Math.PI * 2);
+        ctx.arc(cx, cy, Math.max(1.5, cs * 0.05), 0, Math.PI * 2);
         ctx.fill();
+        ctx.globalAlpha = 1.0;
       }
     }
     ctx.restore();
@@ -697,7 +703,8 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
       s.longPressTimer = null;
     }
 
-    // Release press-squish with damped harmonic spring bounce
+    // Cache pressed arrow before resetting so micro-drift on finger lift doesn't drop tap
+    const candidatePressedArrow = s.pressedArrow;
     if (s.pressedArrow) {
       s.pressedArrow.isPressed = false;
       s.pressedArrow.pressReleaseTime = performance.now();
@@ -724,7 +731,12 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const arrow = getArrowAtPoint(e.clientX, e.clientY, rect);
+    let arrow = getArrowAtPoint(e.clientX, e.clientY, rect);
+
+    // If pointer lifted slightly off target, fall back to the initially pressed arrow
+    if (!arrow && candidatePressedArrow && !candidatePressedArrow.isGone && !candidatePressedArrow.isMoving) {
+      arrow = candidatePressedArrow;
+    }
 
     if (!arrow || arrow.isGone || arrow.isMoving) return;
 
@@ -903,16 +915,29 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
     const gridX = unscaledX / s.cellSize - 1;
     const gridY = unscaledY / s.cellSize - 1;
 
-    // Minimum 44px effective tap tolerance
-    const tapTolerance = largeTapTargets ? 0.95 : 0.65;
+    // Generous effective tap tolerance (minimum 44-56 CSS pixels for accessible touch targets)
+    const minPixels = largeTapTargets ? 56 : 44;
+    const pixelTolerance = minPixels / (s.cellSize * s.scale);
+    const tapTolerance = Math.max(1.15, pixelTolerance);
     let closestArrow: RuntimeArrow | null = null;
     let minDistance = tapTolerance;
 
     for (const arrow of s.arrows) {
       if (arrow.isGone || arrow.isMoving) continue;
       const pts = arrow.trajectory.slice(0, arrow.c.length);
+
+      // 1. Check distance to each cell center (vital for 1-cell arrows!)
+      for (const pt of pts) {
+        const distPt = Math.hypot(gridX - pt[0], gridY - pt[1]);
+        if (distPt < minDistance) {
+          minDistance = distPt;
+          closestArrow = arrow;
+        }
+      }
+
+      // 2. Check distance along linear segments
       for (let i = 0; i < pts.length - 1; i++) {
-        const dist = pointToSegmentDistance(
+        const distSeg = pointToSegmentDistance(
           gridX,
           gridY,
           pts[i][0],
@@ -920,10 +945,21 @@ export const CanvasBoard: React.FC<CanvasBoardProps> = ({
           pts[i + 1][0],
           pts[i + 1][1]
         );
-        if (dist < minDistance) {
-          minDistance = dist;
+        if (distSeg < minDistance) {
+          minDistance = distSeg;
           closestArrow = arrow;
         }
+      }
+
+      // 3. Check distance to arrowhead tip protruding beyond head cell
+      const headPt = pts[pts.length - 1];
+      const dir = DIRECTIONS[arrow.d];
+      const tipX = headPt[0] + dir.dx * 0.65;
+      const tipY = headPt[1] + dir.dy * 0.65;
+      const distTip = Math.hypot(gridX - tipX, gridY - tipY);
+      if (distTip < minDistance) {
+        minDistance = distTip;
+        closestArrow = arrow;
       }
     }
 
@@ -993,25 +1029,23 @@ function drawTactileArrow(
   const isFlashing = (arrow.blockedFlashUntil && arrow.blockedFlashUntil > now) || isBlockerFlash;
   const isHighlighted = (arrow.highlightUntil && arrow.highlightUntil > now) || isIdleHint || isPreview;
 
-  // Color selection
-  let baseColor = theme.line;
+  // Color selection matching reference image: Forest Teal (#266b62), Charcoal (#1f2421), Warm Ochre (#cca053)
+  const editorialPalette = ['#266b62', '#1f2421', '#cca053'];
+  let baseColor = theme.id === 0 ? editorialPalette[arrow.id % editorialPalette.length] : theme.line;
   let highlightColor = '#ffffff';
 
   if (arrow.isMoving) {
-    baseColor = '#10b981'; // Emerald rush on exit
+    baseColor = '#1e8270'; // Emerald rush on exit
     highlightColor = '#a7f3d0';
   } else if (isFlashing) {
-    baseColor = '#ef4444'; // Crimson danger
+    baseColor = '#dc2626'; // Crimson danger
     highlightColor = '#fca5a5';
   } else if (isHighlighted) {
-    baseColor = '#f59e0b'; // Amber golden glow
+    baseColor = '#d49b44'; // Amber golden glow for free / hint arrow
     highlightColor = '#fef3c7';
   } else if (skin === 'neon') {
     baseColor = '#38bdf8'; // Electric cyan
     highlightColor = '#e0f2fe';
-  } else if (theme.id === 8) {
-    baseColor = '#e2e8f0'; // Crystalline frosted glass
-    highlightColor = '#ffffff';
   }
 
   // Continuous parametric trajectory sampling for liquid sub-pixel smooth movement

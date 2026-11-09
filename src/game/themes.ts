@@ -8,12 +8,12 @@ import type { ThemeColors, ThemeId } from './types';
 export const THEMES: readonly ThemeColors[] = [
   {
     id: 0,
-    name: 'Paper Zen',
-    bg: '#f5e7d3',
-    line: '#6b4528',
-    drop: '#3fa7e6',
-    accent: '#f29a1c',
-    cardBg: '#fcf6ee',
+    name: 'Arrows Editorial',
+    bg: '#f4efe6',
+    line: '#1f2421',
+    drop: '#266b62',
+    accent: '#cca053',
+    cardBg: '#fdfaf4',
   },
   {
     id: 1,
@@ -80,12 +80,12 @@ export const THEMES: readonly ThemeColors[] = [
   },
   {
     id: 8,
-    name: 'Glassmorphism',
-    bg: '#0a0f1d',
-    line: '#e2e8f0',
-    drop: '#38bdf8',
-    accent: '#2dd4bf',
-    cardBg: 'rgba(255, 255, 255, 0.10)',
+    name: 'Forest Charcoal',
+    bg: '#181e1c',
+    line: '#e8efe9',
+    drop: '#38a89d',
+    accent: '#dca858',
+    cardBg: '#222926',
   },
 ] as const;
 

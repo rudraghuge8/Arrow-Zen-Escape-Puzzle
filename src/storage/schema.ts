@@ -73,7 +73,7 @@ export const DEFAULT_STORAGE_DATA: StorageDataV2 = {
   unlockedSkins: ['round'],
   unlockedThemes: [0, 1, 2, 3, 8],
   activeSkin: 'round',
-  activeTheme: 8,
+  activeTheme: 0,
   soundEnabled: true,
   musicEnabled: true,
   vibrationEnabled: true,
